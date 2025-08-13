@@ -3,7 +3,10 @@
 use App\Http\Controllers\API\Auth\AuthApiController;
 use App\Http\Controllers\API\Shipper\MyJobController;
 use App\Http\Controllers\API\Shipper\PostJobController;
+use App\Http\Controllers\API\Trucker\BrowseJobController;
+use App\Http\Controllers\API\Trucker\OverviewController;
 use App\Http\Controllers\API\Trucker\ProfileSettingController;
+use App\Http\Controllers\API\Trucker\SetAvailabilityController;
 use App\Http\Controllers\API\Trucker\TrackDeliveryController;
 use Illuminate\Support\Facades\Route;
 
@@ -54,5 +57,16 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::post('password/update', [ProfileSettingController::class, 'updatePassword']);
         //delete account
         Route::post('delete/account', [ProfileSettingController::class, 'deleteAccount']);
+
+        //browse jobs
+        Route::get('browse-job', [BrowseJobController::class, 'browseJob']);
+
+        //set Availability
+        Route::get('set-availability', [SetAvailabilityController::class, 'index']);
+        Route::post('set-availability/store', [SetAvailabilityController::class, 'store']);
+
+        //overview route
+        Route::get('home-overview', [OverviewController::class, 'overview']);
+
     });
 });

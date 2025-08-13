@@ -1,43 +1,40 @@
 <?php
 
-namespace App\Http\Controllers\API\Shipper;
+namespace App\Http\Controllers\API\Trucker;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\Shipper\OverviewResource;
+use App\Http\Resources\Trucker\OverviewResource;
 use App\Models\JobPost;
 use App\Traits\ApiResponse;
+use Illuminate\Http\Request;
 
 class OverviewController extends Controller
 {
     use ApiResponse;
+
     public function overview()
     {
         $userId = auth()->id();
 
-        // Count of available jobs (Pending)
+        // Example calculations
         $availableJobsCount = JobPost::where('delivery_status', 'Pending')->count();
-
-        // Earnings for the current month
         $earningsThisMonth = JobPost::where('user_id', $userId)
             ->whereMonth('created_at', now()->month)
             ->sum('budget_amount');
-
-        // Total completed jobs
         $totalCompleteJobs = JobPost::where('user_id', $userId)
             ->where('delivery_status', 'Complete')
             ->count();
-
-        // Completed jobs this month
         $completedThisMonth = JobPost::where('user_id', $userId)
             ->where('delivery_status', 'Complete')
             ->whereMonth('created_at', now()->month)
             ->count();
 
-        // Latest 5 jobs of the authenticated user
-        $myJobs = JobPost::where('user_id', $userId)
-            ->latest()
-            ->limit(3)
-            ->get();
+        // Mock rating data
+        $averageRating = 4.8;
+        $totalReviews = 24;
+
+        $availableJobs = JobPost::where('delivery_status', 'Pending')->limit(3)->get();
+        $myJobs = JobPost::where('user_id', $userId)->limit(5)->get();
 
         $data = (object)[
             'available_jobs_count' => $availableJobsCount,
@@ -45,6 +42,9 @@ class OverviewController extends Controller
             'earnings_this_month' => $earningsThisMonth,
             'total_complete_jobs' => $totalCompleteJobs,
             'completed_this_month' => $completedThisMonth,
+            'average_rating' => $averageRating,
+            'total_reviews' => $totalReviews,
+            'available_jobs' => $availableJobs,
             'my_jobs' => $myJobs,
         ];
         return $this->sendResponse(new OverviewResource($data), 'Overview fetched successfully');

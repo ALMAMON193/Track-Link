@@ -23,6 +23,8 @@ class PostJobRequest extends FormRequest
             'pickup_zip' => 'required|string|max:20',
             'pickup_latitude' => 'required|numeric',
             'pickup_longitude' => 'required|numeric',
+            'delivery_latitude' => 'required|numeric',
+            'delivery_longitude' => 'required|numeric',
 
             'delivery_address' => 'required|string|max:255',
             'delivery_city' => 'required|string|max:100',

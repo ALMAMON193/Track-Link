@@ -31,6 +31,8 @@ return new class extends Migration {
             $table->string ('delivery_city');
             $table->string ('delivery_state');
             $table->string ('delivery_zip');
+            $table->float('delivery_latitude');
+            $table->float('delivery_longitude');
             // Cargo details
             $table->string ('cargo_type');
             $table->decimal ('weight', 8, 2);
@@ -55,12 +57,14 @@ return new class extends Migration {
             $table->decimal ('budget_amount', 10, 2);
             $table->string ('currency');
             $table->enum ('delivery_status', ['Pending', 'Delayed', 'Complete', 'In_Transport'])->default ('Pending');
-            $table->enum ('tracking_time', [
+            $table->enum ('tracking_status', [
                 'Customs Clearance',
                 'Departed from Port',
                 'In Transit',
                 'Arrived at Port',
             ])->nullable ();
+            $table->string('tracking_location')->nullable();
+            $table->timestamp('tracking_date')->nullable();
             $table->timestamps ();
         });
     }

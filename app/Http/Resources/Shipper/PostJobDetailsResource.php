@@ -2,16 +2,13 @@
 
 namespace App\Http\Resources\Shipper;
 
+use App\Helpers\Helper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class PostJobDetailsResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     *
-     * @return array<string, mixed>
-     */
+
     public function toArray(Request $request): array
     {
 
@@ -21,47 +18,27 @@ class PostJobDetailsResource extends JsonResource
             'package_name' => $this->package_name,
             'shipment_type' => $this->shipment_type,
             'priority' => $this->priority,
-            'pickup_location' => [
-                'address' => $this->pickup_address,
-                'city' => $this->pickup_city,
-                'state' => $this->pickup_state,
-                'zip' => $this->pickup_zip,
-                'latitude' => $this->pickup_latitude,
-                'longitude' => $this->pickup_longitude,
-                'pickup_date' => $this->pickup_date ? \Carbon\Carbon::parse($this->pickup_date)->format('F d, Y') : null,
-                'pickup_time' => $this->pickup_time ? \Carbon\Carbon::parse($this->pickup_time)->format('H:i') : null,
-                'delivery_date' => $this->delivery_date ? \Carbon\Carbon::parse($this->delivery_date)->format('F d, Y') : null,
-                'delivery_time' => $this->delivery_time ? \Carbon\Carbon::parse($this->delivery_time)->format('H:i') : null,
-
+            'pickup_location'   => "{$this->pickup_city}, {$this->pickup_state}",
+            'delivery_location' => "{$this->delivery_city}, {$this->delivery_state}",
+            'cargo'             => "{$this->quantity} containers, {$this->weight} {$this->weight_type}",
+            'distance' => Helper::formatDistance(
+                $this->pickup_latitude,
+                $this->pickup_longitude,
+                $this->delivery_latitude,
+                $this->delivery_longitude
+            ),
+            'departed_schedule' => [
+                'departed_start' => Helper::formatDate($this->pickup_date),
+                'departed_end'   => Helper::formatDate($this->delivery_date),
+                'percentage'     => Helper::percentageCalculate($this->delivery_status),
             ],
-            'delivery_location' => [
-                'address' => $this->delivery_address,
-                'city' => $this->delivery_city,
-                'state' => $this->delivery_state,
-                'zip' => $this->delivery_zip,
-                'pickup_date' => $this->pickup_date ? \Carbon\Carbon::parse($this->pickup_date)->format('F d, Y') : null,
-                'pickup_time' => $this->pickup_time ? \Carbon\Carbon::parse($this->pickup_time)->format('H:i') : null,
-                'delivery_date' => $this->delivery_date ? \Carbon\Carbon::parse($this->delivery_date)->format('F d, Y') : null,
-                'delivery_time' => $this->delivery_time ? \Carbon\Carbon::parse($this->delivery_time)->format('H:i') : null,
-
-            ],
-            'cargo' => [
-                'type' => $this->cargo_type,
-                'weight' => $this->weight,
-                'weight_type' => $this->weight_type,
-                'quantity' => $this->quantity,
-                'dimensions' => [
-                    'length' => $this->length,
-                    'width' => $this->width,
-                    'height' => $this->height,
-                ],
-            ],
+            'tracking_timeline' => Helper::getTrackingTimeline($this),
             'shipment_information' => [
                 'package_name' => $this->package_name,
-                'shipping_method' => 'Ocean Freight', // You may want to add this field to the DB if dynamic
-                'insurance' => 'Full Coverage',      // Add DB columns if needed
-                'incoterms' => 'FOB ' . $this->pickup_city,  // Dynamic if possible
-                'container_type' => '40ft Standard',          // Add DB columns if needed
+                'shipping_method' => 'Ocean Freight',
+                'insurance' => 'Full Coverage',
+                'incoterms' => 'FOB ' . $this->pickup_city,
+                'container_type' => '40ft Standard',
             ],
             'options' => [
                 'is_urgent_shipment' => $this->is_urgent_shipment,

@@ -7,8 +7,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Trucker\MyJobResource;
 use App\Http\Resources\Trucker\UpdateDeliveryStatusResource;
 use App\Http\Resources\Trucker\UpdateTrackingStatusResource;
-use App\Mail\JobPostStatusUpdatedMail;
-use App\Mail\TrackingStatusMail;
 use App\Models\JobApplication;
 use App\Models\JobPost;
 use App\Models\User;
@@ -36,14 +34,6 @@ class TrackDeliveryController extends Controller
             __ ('Fetch My Jobs')
         );
     }
-
-    public function edit ($id)
-    {
-        $job = JobPost::findOrFail ($id);
-        return view ('jobs.edit', compact ('job'));
-    }
-
-
     //change a delivery status
     public function updateDeliveryStatus (Request $request, $jobPostId)
     {
