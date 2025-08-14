@@ -18,6 +18,8 @@ class JobPost extends Model
         'pickup_zip',
         'pickup_latitude',
         'pickup_longitude',
+        'delivery_longitude',
+        'delivery_latitude',
         'delivery_address',
         'delivery_city',
         'delivery_state',
@@ -42,7 +44,9 @@ class JobPost extends Model
         'budget_amount',
         'currency',
         'delivery_status',
-        'tracking_time',
+        'tracking_status',
+        'tracking_location',
+        'tracking_date'
     ];
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo

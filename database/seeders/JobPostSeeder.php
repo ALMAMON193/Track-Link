@@ -3,126 +3,95 @@
 namespace Database\Seeders;
 
 use App\Models\JobPost;
+use App\Models\JobApplication;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class JobPostSeeder extends Seeder
 {
     public function run(): void
     {
-        $shippers = User::where('user_type', 'shipper')->take(10)->get();
-        $trackers = User::where('user_type', 'tracker')->take(10)->get();
-        $year = now()->year;
+        $now = now();
 
-        $lastJob = JobPost::whereYear('created_at', $year)
-            ->orderByDesc('created_at')
-            ->first();
+        // Get all shippers and truckers
+        $shippers = User::where('user_type', 'shipper')->get();
+        $truckers = User::where('user_type', 'trucker')->get();
 
-        if ($lastJob) {
-            preg_match('/JOB-\d{4}-(\d{3})-?/', $lastJob->job_id, $matches);
-            $lastSequence = isset($matches[1]) ? (int)$matches[1] : 0;
-        } else {
-            $lastSequence = 0;
-        }
+        // Example cities for pickup/delivery
+        $cities = [
+            ['city' => 'Houston', 'state' => 'TX', 'lat' => 29.7604, 'lng' => -95.3698],
+            ['city' => 'Dallas', 'state' => 'TX', 'lat' => 32.7767, 'lng' => -96.7970],
+            ['city' => 'Austin', 'state' => 'TX', 'lat' => 30.2672, 'lng' => -97.7431],
+        ];
 
-        $jobPosts = [];
-        foreach ($shippers as $index => $shipper) {
-            $newSequence = $lastSequence + $index + 1;
-            $sequence = str_pad($newSequence, 3, '0', STR_PAD_LEFT);
+        $shipmentTypes = ['Full Truckload', 'Less than Truckload', 'Parcel'];
+        $cargoTypes = ['Electronics', 'Furniture', 'Food', 'Clothing'];
+        $statuses = ['Pending', 'Accepted', 'Rejected'];
 
-            $jobPosts[] = JobPost::create([
-                'job_id' => "JOB-{$year}-{$sequence}",
+        foreach ($shippers as $shipper) {
+            // 1 job per shipper
+            $pickup = $cities[array_rand($cities)];
+            $delivery = $cities[array_rand($cities)];
+
+            $job = JobPost::create([
+                'job_id' => 'JOB-' . strtoupper(Str::random(6)),
                 'user_id' => $shipper->id,
-                'package_name' => 'Sample Package',
-                'shipment_type' => 'Air',
-                'priority' => 'Standard',
-                'pickup_address' => '123 Pickup St.',
-                'pickup_city' => 'Dhaka',
-                'pickup_state' => 'Dhaka',
-                'pickup_zip' => '1200',
-                'delivery_address' => '456 Delivery Rd.',
-                'delivery_city' => 'Chittagong',
-                'delivery_state' => 'Chittagong',
-                'delivery_zip' => '4000',
-                'pickup_latitude' => 23.8103,
-                'pickup_longitude' => 90.4125,
-                'cargo_type' => 'Electronics',
-                'weight' => 50.75,
+                'package_name' => 'Package for ' . $shipper->name,
+                'shipment_type' => $shipmentTypes[array_rand($shipmentTypes)],
+                'priority' => ['Standard', 'Express', 'Urgent'][array_rand(['Standard', 'Express', 'Urgent'])],
+                'pickup_address' => Str::random(15) . ' Street',
+                'pickup_city' => $pickup['city'],
+                'pickup_state' => $pickup['state'],
+                'pickup_zip' => rand(10000, 99999),
+                'pickup_latitude' => $pickup['lat'],
+                'pickup_longitude' => $pickup['lng'],
+                'delivery_address' => Str::random(15) . ' Avenue',
+                'delivery_city' => $delivery['city'],
+                'delivery_state' => $delivery['state'],
+                'delivery_zip' => rand(10000, 99999),
+                'delivery_latitude' => $delivery['lat'],
+                'delivery_longitude' => $delivery['lng'],
+                'cargo_type' => $cargoTypes[array_rand($cargoTypes)],
+                'weight' => rand(10, 1000),
                 'weight_type' => 'kg',
-                'quantity' => 10,
-                'length' => 100,
-                'width' => 50,
-                'height' => 60,
-                'pickup_date' => now()->addDays(2)->toDateString(),
-                'pickup_time' => '10:00:00',
-                'delivery_date' => now()->addDays(5)->toDateString(),
-                'delivery_time' => '15:00:00',
-                'is_urgent_shipment' => false,
-                'flexible_with_pickup' => true,
-                'temperature_controlled' => false,
-                'fragile_handling' => true,
-                'hazardous_materials' => false,
-                'additional_instructions' => 'Handle with care.',
-                'budget_amount' => 5000,
+                'quantity' => rand(1, 50),
+                'length' => rand(1, 10),
+                'width' => rand(1, 10),
+                'height' => rand(1, 10),
+                'pickup_date' => $now->addDays(rand(1, 5))->toDateString(),
+                'pickup_time' => $now->addHours(rand(1, 24))->toTimeString(),
+                'delivery_date' => $now->addDays(rand(6, 10))->toDateString(),
+                'delivery_time' => $now->addHours(rand(25, 48))->toTimeString(),
+                'is_urgent_shipment' => rand(0, 1),
+                'flexible_with_pickup' => rand(0, 1),
+                'temperature_controlled' => rand(0, 1),
+                'fragile_handling' => rand(0, 1),
+                'hazardous_materials' => rand(0, 1),
+                'additional_instructions' => 'Handle with care',
+                'budget_amount' => rand(100, 5000),
                 'currency' => 'USD',
-                'delivery_status' => 'Pending',
+                'delivery_status' => ['Pending', 'Delayed', 'Complete', 'In_Transport'][array_rand(['Pending', 'Delayed', 'Complete', 'In_Transport'])],
+                'tracking_status' => null,
+                'tracking_location' => null,
+                'tracking_date' => null,
+                'created_at' => $now,
+                'updated_at' => $now,
             ]);
-        }
 
-        // Trackers you want to specifically assign jobs to:
-        $tracker1 = User::find(2);
-        $tracker2 = User::find(3);
-
-        if (!$tracker1 || !$tracker2) {
-            $this->command->error('Tracker with ID 1 or 2 not found!');
-            return;
-        }
-
-        // Assign at least 3 jobs to tracker1
-        for ($i = 0; $i < 3; $i++) {
-            DB::table('job_applications')->insert([
-                'user_id' => $tracker1->id,
-                'job_post_id' => $jobPosts[$i]->id,
-                'assigned_at' => now(),
-                'status' => 'accepted',
-                'rejection_reason' => '',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-
-        // Assign at least 5 jobs to tracker2 (jobs from index 3 to 7)
-        for ($i = 3; $i < 8; $i++) {
-            DB::table('job_applications')->insert([
-                'user_id' => $tracker2->id,
-                'job_post_id' => $jobPosts[$i]->id,
-                'assigned_at' => now(),
-                'status' => 'accepted',
-                'rejection_reason' => '',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
-
-        // For remaining jobs (if any), assign randomly from other trackers
-        $otherTrackers = $trackers->whereNotIn('id', [1, 2])->values();
-
-        for ($i = 8; $i < count($jobPosts); $i++) {
-            if ($otherTrackers->isEmpty()) break;
-
-            $tracker = $otherTrackers->random();
-
-            DB::table('job_applications')->insert([
-                'user_id' => $tracker->id,
-                'job_post_id' => $jobPosts[$i]->id,
-                'assigned_at' => now(),
-                'status' => 'accepted',
-                'rejection_reason' => '',
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            // -----------------------------
+            // Assign job applications automatically
+            // -----------------------------
+            // Assign job applications randomly
+            $applyingTruckers = $truckers->random(rand(1, $truckers->count()));
+            foreach ($applyingTruckers as $trucker) {
+                JobApplication::create([
+                    'job_post_id' => $job->id,
+                    'user_id' => $trucker->id,
+                    'status' => $statuses[array_rand($statuses)],
+                    'assigned_at' => now()->subDays(rand(1,30)),
+                ]);
+            }
         }
     }
 }
