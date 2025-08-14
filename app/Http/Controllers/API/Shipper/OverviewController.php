@@ -6,47 +6,65 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Shipper\OverviewResource;
 use App\Models\JobPost;
 use App\Traits\ApiResponse;
+use Illuminate\Support\Carbon;
 
 class OverviewController extends Controller
 {
     use ApiResponse;
-    public function overview()
+    public function shipperOverview()
     {
         $userId = auth()->id();
-
-        // Count of available jobs (Pending)
-        $availableJobsCount = JobPost::where('delivery_status', 'Pending')->count();
-
-        // Earnings for the current month
-        $earningsThisMonth = JobPost::where('user_id', $userId)
-            ->whereMonth('created_at', now()->month)
-            ->sum('budget_amount');
-
-        // Total completed jobs
-        $totalCompleteJobs = JobPost::where('user_id', $userId)
+        // Base query to avoid repeating "where user_id = $userId" in all queries
+        $baseQuery = JobPost::where('user_id', $userId);
+        // Total jobs created by the user
+        $totalJobPost = (clone $baseQuery)->count();
+        // Jobs created this week
+        $totalJobPostThisWeek = (clone $baseQuery)
+            ->where('created_at', '>=', Carbon::now()->startOfWeek())
+            ->count();
+        // Jobs currently in transport
+        $totalInTransport = (clone $baseQuery)
+            ->where('delivery_status', 'In_Transport')
+            ->count();
+        // Jobs scheduled to be delivered today
+        $todayArrivingJob = (clone $baseQuery)
+            ->whereDate('delivery_date', Carbon::today())
+            ->count();
+        // All completed jobs (status = Complete)
+        $totalDeliveredJob = (clone $baseQuery)
             ->where('delivery_status', 'Complete')
             ->count();
-
-        // Completed jobs this month
-        $completedThisMonth = JobPost::where('user_id', $userId)
+        // Jobs completed this month
+        $thisMonthDeliveredJob = (clone $baseQuery)
             ->where('delivery_status', 'Complete')
-            ->whereMonth('created_at', now()->month)
+            ->whereBetween('delivery_date', [
+                Carbon::now()->startOfMonth(),
+                Carbon::now()->endOfMonth()
+            ])
             ->count();
+        // Total spend amount for all jobs
+        $totalSpendAmount = "2000.00";
+        // Total spend amount from last month
+        $totalSpendAmountLastMonth = " - 8%";
 
-        // Latest 5 jobs of the authenticated user
-        $myJobs = JobPost::where('user_id', $userId)
-            ->latest()
-            ->limit(3)
+        // Resent job Get the latest 3 jobs for dashboard display
+        $recentJobs = (clone $baseQuery)
+            ->orderBy('created_at', 'desc')
+            ->take(3)
             ->get();
-
+        //prepare response data
         $data = (object)[
-            'available_jobs_count' => $availableJobsCount,
-            'available_jobs_change_percentage' => 12,
-            'earnings_this_month' => $earningsThisMonth,
-            'total_complete_jobs' => $totalCompleteJobs,
-            'completed_this_month' => $completedThisMonth,
-            'my_jobs' => $myJobs,
+            'total_job_post'                => $totalJobPost,
+            'total_job_post_this_week'      => $totalJobPostThisWeek,
+            'total_in_transport'            => $totalInTransport,
+            'today_arriving_job'            => $todayArrivingJob,
+            'total_delivered_job'           => $totalDeliveredJob,
+            'this_month_delivered_job'      => $thisMonthDeliveredJob,
+            'total_spend_amount'            => $totalSpendAmount,
+            'total_spend_amount_last_month' => $totalSpendAmountLastMonth,
+            'recent_jobs'                   => $recentJobs,
         ];
-        return $this->sendResponse(new OverviewResource($data), 'Overview fetched successfully');
+        // Send API response with OverviewResource
+        return $this->sendResponse(new OverviewResource($data), __('Overview fetched successfully'));
     }
 }

@@ -129,13 +129,16 @@ class ProfileSettingController extends Controller
 
         return $this->sendResponse([], 'Driving credentials updated successfully.');
     }
-
     public function updatePassword(UpdatePasswordRequest $request)
     {
         $user = auth()->user();
         // Check if current password matches
         if (!Hash::check($request->current_password, $user->password)) {
-            return $this->sendError('Current password is incorrect.');
+            return $this->sendError('The current password is incorrect.');
+        }
+        // Check if new password is the same as current password
+        if (Hash::check($request->new_password, $user->password)) {
+            return $this->sendError('Your new password cannot be the same as your current password. Please choose a different one.');
         }
         // Update password
         $user->password = Hash::make($request->new_password);

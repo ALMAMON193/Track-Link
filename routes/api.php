@@ -33,6 +33,18 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::get('my-jobs', [MyJobController::class, 'myJobs']);
         Route::post('post-job', [PostJobController::class, 'postJob']);
         Route::get('post-job/{id}', [PostJobController::class, 'postJobDetails']);
+        //overview route
+        Route::get('overview', [\App\Http\Controllers\API\Shipper\OverviewController::class, 'shipperOverview']);
+
+        //personal information
+        Route::get('personal-info', [\App\Http\Controllers\API\Shipper\ProfileSettingController::class, 'personalInformation']);
+        Route::post('personal-info/update', [\App\Http\Controllers\API\Shipper\ProfileSettingController::class, 'updatePersonalInformation']);
+
+        //update password
+        Route::post('password/update', [\App\Http\Controllers\API\Shipper\ProfileSettingController::class, 'updatePassword']);
+        //delete account
+        Route::post('delete/account', [\App\Http\Controllers\API\Shipper\ProfileSettingController::class, 'deleteAccount']);
+
     });
     // Trucker Routes
     Route::prefix('trucker')->middleware('trucker')->group(function () {
