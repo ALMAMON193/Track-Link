@@ -27,7 +27,7 @@ class JobPostSeeder extends Seeder
 
         $shipmentTypes = ['Full Truckload', 'Less than Truckload', 'Parcel'];
         $cargoTypes = ['Electronics', 'Furniture', 'Food', 'Clothing'];
-        $statuses = ['Pending', 'Accepted', 'Rejected'];
+//        $statuses = ['applied', 'accepted', 'rejected'];
 
         foreach ($shippers as $shipper) {
             // 1 job per shipper
@@ -83,15 +83,15 @@ class JobPostSeeder extends Seeder
             // Assign job applications automatically
             // -----------------------------
             // Assign job applications randomly
-            $applyingTruckers = $truckers->random(rand(1, $truckers->count()));
-            foreach ($applyingTruckers as $trucker) {
-                JobApplication::create([
-                    'job_post_id' => $job->id,
-                    'user_id' => $trucker->id,
-                    'status' => $statuses[array_rand($statuses)],
-                    'assigned_at' => now()->subDays(rand(1,30)),
-                ]);
-            }
+//            $applyingTruckers = $truckers->random(rand(1, $truckers->count()));
+//            foreach ($applyingTruckers as $trucker) {
+//                JobApplication::create([
+//                    'job_post_id' => $job->id,
+//                    'user_id' => $trucker->id,
+//                    'status' => $statuses[array_rand($statuses)],
+//                    'assigned_at' => now()->subDays(rand(1,30)),
+//                ]);
+//            }
         }
     }
 }

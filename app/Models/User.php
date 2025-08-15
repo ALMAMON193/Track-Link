@@ -104,7 +104,6 @@ class User extends  Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(ExperiencePreference::class);
     }
-
     public function driverDetail()
     {
         return $this->hasOne(DriverDetail::class);

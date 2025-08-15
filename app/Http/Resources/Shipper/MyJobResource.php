@@ -35,5 +35,4 @@ class MyJobResource extends JsonResource
             ),
         ];
     }
-
 }

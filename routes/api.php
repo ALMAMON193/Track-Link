@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\Auth\AuthApiController;
+use App\Http\Controllers\API\Shipper\JobRequestController;
 use App\Http\Controllers\API\Shipper\MyJobController;
 use App\Http\Controllers\API\Shipper\PostJobController;
 use App\Http\Controllers\API\Trucker\BrowseJobController;
@@ -44,7 +45,10 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::post('password/update', [\App\Http\Controllers\API\Shipper\ProfileSettingController::class, 'updatePassword']);
         //delete account
         Route::post('delete/account', [\App\Http\Controllers\API\Shipper\ProfileSettingController::class, 'deleteAccount']);
-
+        //job request
+        Route::get('request-job', [\App\Http\Controllers\API\Shipper\JobRequestController::class, 'index']);
+        Route::get('request-job/{id}', [\App\Http\Controllers\API\Shipper\JobRequestController::class, 'show']);
+        Route::get('request-job/{jobId}/users/{userId}', [\App\Http\Controllers\API\Shipper\JobRequestController::class, 'userDetails']);
     });
     // Trucker Routes
     Route::prefix('trucker')->middleware('trucker')->group(function () {
@@ -72,6 +76,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
         //browse jobs
         Route::get('browse-job', [BrowseJobController::class, 'browseJob']);
+        Route::post('apply-job', [BrowseJobController::class, 'applyJob']);
 
         //set Availability
         Route::get('set-availability', [SetAvailabilityController::class, 'index']);

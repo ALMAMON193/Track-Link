@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignIdFor (User::class)->constrained ()->onDelete ('cascade');
             $table->foreignIdFor (JobPost::class)->constrained ()->onDelete ('cascade');
             $table->timestamp('assigned_at')->nullable();
-            $table->enum ('status', ['pending', 'accepted', 'rejected'])->default('pending');
+            $table->enum ('status', ['applied', 'accepted', 'rejected'])->default('applied');
             $table->text('rejection_reason')->nullable();
             $table->timestamps();
         });
