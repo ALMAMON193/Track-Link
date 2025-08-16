@@ -35,43 +35,67 @@ class TrackDeliveryController extends Controller
         );
     }
     //change a delivery status
-    public function updateDeliveryStatus (Request $request, $jobPostId)
+    public function updateDeliveryStatus(Request $request, $jobPostId)
     {
-        $request->validate ([
-            'delivery_status' => 'required|in:Pending,Delayed,Complete,In_Transport',
-        ]);
+        try {
+            // Validate input
+            $validated = $request->validate([
+                'delivery_status' => 'required|in:Pending,Delayed,Complete,In_Transport',
+            ]);
+            // Find JobPost
+            $jobPost = JobPost::findOrFail($jobPostId);
+            // Update delivery status
+            $jobPost->delivery_status = $validated['delivery_status'];
+            $jobPost->save();
+            // Send notification
+            if ($jobPost->user) {
+                $jobPost->user->notify(new OrderStatusUpdated($jobPost, 'Delivery', $validated['delivery_status']));
+            }
+            return $this->sendResponse(
+                new UpdateDeliveryStatusResource($jobPost),
+                __('Delivery Status Updated Successfully.')
+            );
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->sendError('Validation Error', $e->errors(), 422);
 
-        $jobPost = JobPost::findOrFail ($jobPostId);
-        $jobPost->delivery_status = $request->input ('delivery_status');
-        $jobPost->save ();
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->sendError('Job Post Not Found');
 
-        // Send notification to the user who created the job post
-        $jobPost->user->notify (new OrderStatusUpdated($jobPost, 'Delivery', $request->delivery_status));
-
-        return $this->sendResponse (
-            new UpdateDeliveryStatusResource($jobPost),
-            __ ('Delivery Status Updated')
-        );
+        } catch (\Exception $e) {
+            Log::error('Delivery Status Update Failed: '.$e->getMessage(), ['jobPostId' => $jobPostId]);
+            return $this->sendError('Something went wrong. Please try again later.');
+        }
     }
 
-    //change a tracking  status
-    public function updateTrackingStatus (Request $request, $jobPostId)
+    public function updateTrackingStatus(Request $request, $jobPostId)
     {
-        $request->validate ([
-            'tracking_time_status' => 'required|in:Customs Clearance,Departed from Port,In Transit,Arrived at Port',
-        ]);
+        try {
+            // Validate input
+            $validated = $request->validate([
+                'tracking_time_status' => 'required|in:Customs Clearance,Departed from Port,In Transit,Arrived at Port',
+            ]);
+            // Find JobPost
+            $jobPost = JobPost::findOrFail($jobPostId);
+            // Update tracking time
+            $jobPost->tracking_time = $validated['tracking_time_status'];
+            $jobPost->save();
+            // Send notification
+            if ($jobPost->user) {
+                $jobPost->user->notify(new OrderStatusUpdated($jobPost, 'Tracking', $validated['tracking_time_status']));
+            }
+            return $this->sendResponse(
+                new UpdateTrackingStatusResource($jobPost),
+                __('Tracking Status Updated Successfully.')
+            );
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->sendError('Validation Error', $e->errors(), 422);
 
-        $jobPost = JobPost::findOrFail ($jobPostId);
-        $jobPost->tracking_time = $request->input ('tracking_time_status');
-        $jobPost->save ();
-
-        // Send notification to the user who created the job post
-        $jobPost->user->notify (new OrderStatusUpdated($jobPost, 'Tracking', $request->tracking_time_status));
-
-        return $this->sendResponse (
-            new UpdateTrackingStatusResource($jobPost),
-            __ ('Tracking Status Updated')
-        );
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return $this->sendError('Job Post Not Found');
+        } catch (\Exception $e) {
+            Log::error('Tracking Status Update Failed: '.$e->getMessage(), ['jobPostId' => $jobPostId]);
+            return $this->sendError('Something went wrong. Please try again later.');
+        }
     }
 
 }
