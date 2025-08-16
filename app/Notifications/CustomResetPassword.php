@@ -6,11 +6,13 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+
 class CustomResetPassword extends Notification
 {
-    public $token;
 
-    public function __construct($token)
+    public string $token;
+
+    public function __construct(string $token)
     {
         $this->token = $token;
     }
@@ -19,14 +21,29 @@ class CustomResetPassword extends Notification
     {
         return ['mail'];
     }
+
     public function toMail($notifiable): MailMessage
     {
-        $resetUrl = url("https://your-frontend.com/reset-password/{$this->token}?email={$notifiable->getEmailForPasswordReset()}");
+        // Get frontend base URL from config (.env)
+        $frontendUrl = config('app.frontend_url', 'https://craigharlequin-next-js.vercel.app');
+
+        // Construct reset password URL
+        $resetUrl = $frontendUrl
+            . "/reset-password/{$this->token}"
+            . "?email=" . urlencode($notifiable->getEmailForPasswordReset());
 
         return (new MailMessage)
             ->subject('Reset Your Password')
-            ->line('Click the button below to reset your password.')
+            ->line('You are receiving this email because we received a password reset request for your account.')
             ->action('Reset Password', $resetUrl)
             ->line('If you did not request a password reset, no further action is required.');
+    }
+
+
+    public function toArray($notifiable): array
+    {
+        return [
+            'token' => $this->token,
+        ];
     }
 }

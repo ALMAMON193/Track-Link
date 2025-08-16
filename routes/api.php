@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\Auth\AuthApiController;
 use App\Http\Controllers\API\Shipper\JobRequestController;
+use App\Http\Controllers\API\Shipper\MMGPaymentController;
 use App\Http\Controllers\API\Shipper\MyJobController;
 use App\Http\Controllers\API\Shipper\PostJobController;
 use App\Http\Controllers\API\Trucker\BrowseJobController;
@@ -49,6 +50,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::get('request-job', [\App\Http\Controllers\API\Shipper\JobRequestController::class, 'index']);
         Route::get('request-job/{id}', [\App\Http\Controllers\API\Shipper\JobRequestController::class, 'show']);
         Route::get('request-job/{jobId}/users/{userId}', [\App\Http\Controllers\API\Shipper\JobRequestController::class, 'userDetails']);
+        Route::post('/mmg/payment', [MMGPaymentController::class, 'merchantPayment']);
     });
     // Trucker Routes
     Route::prefix('trucker')->middleware('trucker')->group(function () {

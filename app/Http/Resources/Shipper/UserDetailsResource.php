@@ -35,7 +35,6 @@ class UserDetailsResource extends JsonResource
                 'service_area'=> $this->experiencePreference->service_area,
                 'additional_information'=> $this->experiencePreference->additional_information,
             ] : [],
-
             'applied_at' => $this->application?->created_at?->toDateTimeString(),
         ];
     }

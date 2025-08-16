@@ -24,6 +24,8 @@ use Illuminate\Support\Str;
 class AuthApiController extends Controller
 {
     use ApiResponse;
+
+
     public function registerApi(RegisterRequest $request)
     {
         $validated = $request->validated();
@@ -66,37 +68,49 @@ class AuthApiController extends Controller
     public function resendVerificationEmailApi(ResendVerificationRequest $request)
     {
         $user = User::where('email', $request->email)->first();
-
-        if ($user->email_verified_at) {
-            return $this->sendError('Email already verified.');
+        if (!$user) {
+            return $this->sendError('User not found.');
         }
-        try {
-            $user->sendVerification();
-        } catch (Exception $e) {
-            return $this->sendError('Failed to resend verification email.');
-        }
-
-        return $this->sendResponse([], 'Verification email resent successfully.');
-    }
-    public function verifyEmailApi(Request $request): \Illuminate\Http\JsonResponse
-    {
-        $user = User::findOrFail($request->route('id'));
-        if (! URL::hasValidSignature($request)) {
-            return $this->sendError('Invalid or expired verification link.');
-        }
-
         if ($user->hasVerifiedEmail()) {
             return $this->sendError('Email already verified.');
         }
+        try {
+            $user->sendEmailVerifiedNotification();
+        } catch (\Exception $e) {
+            \Log::error('Resend verification email failed: '.$e->getMessage());
+            return $this->sendError('Failed to resend verification email.');
+        }
+        return $this->sendResponse([], 'Verification email resent successfully.');
+    }
+    // Verify email
+    public function verifyEmailApi(Request $request)
+    {
+        $user = User::findOrFail($request->route('id'));
+        // Default frontend redirect URL for success
+        $frontendUrl = config('app.frontend_url') . '/auth/verified-success';
 
+        // If the link is invalid or expired
+        if (! URL::hasValidSignature($request)) {
+            $frontendUrl .= '?verified=0&message=' . urlencode('Invalid or expired link');
+            return redirect($frontendUrl);
+        }
+        // If email already verified
+        if ($user->hasVerifiedEmail()) {
+            $frontendUrl .= '?verified=1&message=' . urlencode('Email already verified');
+            return redirect($frontendUrl);
+        }
+        // Mark email as verified
         $user->markEmailAsVerified();
+
         if ($user->user_type !== 'admin') {
             $user->update([
                 'is_verified' => true,
                 'verified_at' => now(),
             ]);
         }
-        return $this->sendResponse([], 'Email verified successfully.');
+        // Successful verification
+        $frontendUrl .= '?verified=1&message=' . urlencode('Email verified successfully');
+        return redirect($frontendUrl);
     }
     public function loginApi(Request $request): \Illuminate\Http\JsonResponse
     {
@@ -133,9 +147,13 @@ class AuthApiController extends Controller
     {
         $validated = $request->validated();
         $status = Password::sendResetLink(['email' => $validated['email']]);
-        return $status === Password::RESET_LINK_SENT
-            ? $this->sendResponse([], 'Password reset link sent to your email.')
-            : $this->sendError('Unable to send reset link.');
+        $frontendUrl = config('app.frontend_url') . '/auth/forgot-password';
+        if ($status === Password::RESET_LINK_SENT) {
+            $frontendUrl .= '?status=success&message=' . urlencode('Password reset link sent to your email.');
+        } else {
+            $frontendUrl .= '?status=error&message=' . urlencode('Unable to send reset link.');
+        }
+        return redirect($frontendUrl);
     }
     public function resetPasswordApi(ResetPasswordRequest $request)
     {
@@ -149,11 +167,16 @@ class AuthApiController extends Controller
                     'reset_password_token' => null,
                     'reset_password_token_expire_at' => null,
                 ])->save();
+
                 event(new PasswordReset($user));
             }
         );
-        return $status === Password::PASSWORD_RESET
-            ? $this->sendResponse([], 'Password reset successfully.')
-            : $this->sendError('Invalid token or email.');
+        $frontendUrl = config('app.frontend_url') . '/auth/login';
+        if ($status === Password::PASSWORD_RESET) {
+            $frontendUrl .= '?status=success&message=' . urlencode('Password reset successfully. You can now login.');
+        } else {
+            $frontendUrl .= '?status=error&message=' . urlencode('Invalid token or email.');
+        }
+        return redirect($frontendUrl);
     }
 }

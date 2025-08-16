@@ -34,5 +34,13 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'mmg' => [
+        'resourcetoken_apikey' => env('MMG_RESOURCETOKEN_APIKEY'),
+        'merchant_mid'         => env('MMG_MERCHANT_MID'),
+        'merchant_password'    => env('MMG_MERCHANT_PASSWORD'),
+        'merchant_mkey'        => env('MMG_MERCHANT_MKEY'),
+        'merchant_msecret'     => env('MMG_MERCHANT_MSECRET'),
+        'x_api_key'            => env('MMG_X_API_KEY'),
+    ],
 
 ];
