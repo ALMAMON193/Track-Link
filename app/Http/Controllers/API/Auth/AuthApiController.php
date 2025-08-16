@@ -86,30 +86,25 @@ class AuthApiController extends Controller
     public function verifyEmailApi(Request $request)
     {
         $user = User::findOrFail($request->route('id'));
-        // Default frontend redirect URL for success
-        $frontendUrl = config('app.frontend_url') . '/auth/verified-success';
-
-        // If the link is invalid or expired
+        // Invalid or expired link
         if (! URL::hasValidSignature($request)) {
-            $frontendUrl .= '?verified=0&message=' . urlencode('Invalid or expired link');
+            $frontendUrl = config('app.frontend_url') . '/auth/email-verify-failed?message=' . urlencode('Invalid or expired link');
             return redirect($frontendUrl);
         }
-        // If email already verified
+        // Already verified
         if ($user->hasVerifiedEmail()) {
-            $frontendUrl .= '?verified=1&message=' . urlencode('Email already verified');
+            $frontendUrl = config('app.frontend_url') . '/auth/verified-success?message=' . urlencode('Email already verified');
             return redirect($frontendUrl);
         }
-        // Mark email as verified
+        // Successful verification
         $user->markEmailAsVerified();
-
         if ($user->user_type !== 'admin') {
             $user->update([
                 'is_verified' => true,
                 'verified_at' => now(),
             ]);
         }
-        // Successful verification
-        $frontendUrl .= '?verified=1&message=' . urlencode('Email verified successfully');
+        $frontendUrl = config('app.frontend_url') . '/auth/verified-success?message=' . urlencode('Email verified successfully');
         return redirect($frontendUrl);
     }
     public function loginApi(Request $request): \Illuminate\Http\JsonResponse
