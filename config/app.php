@@ -122,7 +122,7 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
-    'frontend_url' => env('APP_FRONTEND_URL', 'https://craigharlequin-next-js.vercel.app'),
+    'frontend_urls' => explode(',', env('APP_FRONTEND_URLS', 'https://craigharlequin-next-js.vercel.app')),
 
 
 ];

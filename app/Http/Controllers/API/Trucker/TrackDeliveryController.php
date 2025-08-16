@@ -97,5 +97,4 @@ class TrackDeliveryController extends Controller
             return $this->sendError('Something went wrong. Please try again later.');
         }
     }
-
 }
