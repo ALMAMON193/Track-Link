@@ -5,7 +5,6 @@ namespace App\Http\Controllers\API\Shipper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Shipper\PostJobRequest;
 use App\Http\Resources\Shipper\PostJobDetailsResource;
-use App\Http\Resources\Shipper\PostJobResource;
 use App\Models\JobPost;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;

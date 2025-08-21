@@ -13,6 +13,7 @@ class BrowseJobResource extends JsonResource
             'id'               => $this->id,
             'job_id'           => $this->job_id,
             'package_name'     => $this->package_name,
+            'shipment_type'     => $this->shipment_type,
             'pickup_location'  => [
                 'address' => $this->pickup_address,
                 'city'    => $this->pickup_city,

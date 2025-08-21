@@ -7,23 +7,31 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserDetailsResource extends JsonResource
 {
-    protected $application;
+    protected mixed $application;
+    protected mixed $stats;
 
-    public function __construct($resource, $application = null)
+    public function __construct($resource, $application = null, $stats = [])
     {
         parent::__construct($resource);
         $this->application = $application;
+        $this->stats = $stats;
     }
 
     public function toArray(Request $request): array
     {
         return [
+            'complete_job'  => $this->stats['complete_job'] ?? 0,
+            'ratting'       => $this->stats['ratting'] ?? '0.0',
+            'job_success'   => $this->stats['job_success'] ?? 0,
             'name'   => $this->name,
             'email'  => $this->email,
             'avatar' => $this->personalInformation && $this->personalInformation->avatar
                 ? asset('storage/' . $this->personalInformation->avatar)
                 : '',
             'driver_details' => $this->driverDetail ? [
+                'driver_license' => $this->driverDetail->driverDetail
+                    ? asset('storage/' . $this->driverDetail->driverDetail)
+                    : '',
                 'license_number' => $this->driverDetail->license_number,
                 'state_of_issue' => $this->driverDetail->state_of_issue,
                 'expiration_date'=> $this->driverDetail->expiration_date,

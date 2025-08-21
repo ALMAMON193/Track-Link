@@ -44,6 +44,6 @@ class BrowseJobController extends Controller
             'job_post_id'  => $request->job_post_id,
             'status'       => 'applied',
         ]);
-        return $this->sendResponse([],__('Applied for this job.'));
+        return $this->sendResponse([],__('Successfully Applied for this job.'));
     }
 }

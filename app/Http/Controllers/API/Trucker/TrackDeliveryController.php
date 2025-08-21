@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\Trucker;
 
 use App\Events\TrackingStatusUpdated;
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Trucker\MyJobResource;
 use App\Http\Resources\Trucker\UpdateDeliveryStatusResource;
@@ -66,30 +67,46 @@ class TrackDeliveryController extends Controller
             return $this->sendError('Something went wrong. Please try again later.');
         }
     }
-
+    //update tracking status
     public function updateTrackingStatus(Request $request, $jobPostId)
     {
         try {
-            // Validate input
             $validated = $request->validate([
-                'tracking_time_status' => 'required|in:Customs Clearance,Departed from Port,In Transit,Arrived at Port',
+                'tracking_time_status' => 'required|in:Customs Clearance (Origin),Departed from Port,In Transit,Arrived at Port,Customs Clearance (Destination)',
+                'location' => 'nullable|string',
+                'datetime' => 'nullable|date'
             ]);
-            // Find JobPost
+
             $jobPost = JobPost::findOrFail($jobPostId);
-            // Update tracking time
+
+            // Save latest status on JobPost
             $jobPost->tracking_time = $validated['tracking_time_status'];
+            $jobPost->tracking_location = $validated['location'] ?? null;
+            $jobPost->tracking_date = $validated['datetime'] ?? now();
             $jobPost->save();
+
+            // Insert into tracking history table
+            $jobPost->trackingHistories()->create([
+                'status'   => $validated['tracking_time_status'],
+                'location' => $validated['location'] ?? null,
+                'datetime' => $validated['datetime'] ?? now(),
+            ]);
+
             // Send notification
             if ($jobPost->user) {
-                $jobPost->user->notify(new OrderStatusUpdated($jobPost, 'Tracking', $validated['tracking_time_status']));
+                $jobPost->user->notify(new OrderStatusUpdated(
+                    $jobPost,
+                    'Tracking',
+                    $validated['tracking_time_status']
+                ));
             }
             return $this->sendResponse(
-                new UpdateTrackingStatusResource($jobPost),
+                Helper::getTrackingTimeline($jobPost),
                 __('Tracking Status Updated Successfully.')
             );
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return $this->sendError('Validation Error', $e->errors(), 422);
-
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->sendError('Job Post Not Found');
         } catch (\Exception $e) {
@@ -97,4 +114,5 @@ class TrackDeliveryController extends Controller
             return $this->sendError('Something went wrong. Please try again later.');
         }
     }
+
 }

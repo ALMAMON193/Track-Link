@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API\Shipper;
 
+use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Shipper\RequestJobDetailsResource;
 use App\Http\Resources\Shipper\RequestJobResource;
@@ -51,14 +52,11 @@ class JobRequestController extends Controller
         if (!$application) {
             return $this->sendResponse(null, 'Application not found', 404);
         }
+        $stats = Helper::calculateJobStats($userId);
         // Pass both user and application to the resource
         return $this->sendResponse(
-            new UserDetailsResource($application->user, $application),
+            new UserDetailsResource($application->user, $application,$stats),
             'User details retrieved successfully.'
         );
     }
-
-
-
-
 }

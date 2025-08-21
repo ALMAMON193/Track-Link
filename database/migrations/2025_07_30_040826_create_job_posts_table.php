@@ -65,6 +65,7 @@ return new class extends Migration {
             ])->nullable ();
             $table->string('tracking_location')->nullable();
             $table->timestamp('tracking_date')->nullable();
+            $table->boolean('is_expired')->default(false);
             $table->timestamps ();
         });
     }

@@ -35,11 +35,14 @@ class SetAvailabilityController extends Controller
 
         $validated['user_id'] = auth()->id();
 
+       // Convert time to Carbon to store properly
+        $validated['time'] = \Carbon\Carbon::createFromFormat('H:i', $validated['time'])->format('H:i');
+
         $availability = SetAvailability::updateOrCreate(
             [
                 'user_id' => $validated['user_id'],
                 'date'    => $validated['date'],
-                'time'    => $validated['time']
+                'time'    => $validated['time'],
             ],
             ['is_available' => $validated['is_available']]
         );

@@ -15,6 +15,7 @@ class RequestJobResource extends JsonResource
            'id'                => $this->id,
            'job_id'            => $this->job_id,
            'package_name'      => $this->package_name,
+           'shipment_type'     => $this->shipment_type,
            'pickup_location'   => "{$this->pickup_city}, {$this->pickup_state}",
            'delivery_location' => "{$this->delivery_city}, {$this->delivery_state}",
            'cargo'             => "{$this->quantity} containers, {$this->weight} {$this->weight_type}",

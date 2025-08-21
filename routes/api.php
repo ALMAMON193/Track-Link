@@ -8,10 +8,12 @@ use App\Http\Controllers\API\Shipper\PostJobController;
 use App\Http\Controllers\API\Shipper\OverviewController as ShipperOverviewController;
 use App\Http\Controllers\API\Shipper\ProfileSettingController as ShipperProfileController;
 use App\Http\Controllers\API\Trucker\BrowseJobController;
+use App\Http\Controllers\API\Trucker\NotificationController;
 use App\Http\Controllers\API\Trucker\OverviewController as TruckerOverviewController;
 use App\Http\Controllers\API\Trucker\ProfileSettingController;
 use App\Http\Controllers\API\Trucker\SetAvailabilityController;
 use App\Http\Controllers\API\Trucker\TrackDeliveryController;
+
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -69,7 +71,15 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::get('request-job/{jobId}/users/{userId}', [JobRequestController::class, 'userDetails']);
 
         // MMG Payment
-        Route::post('mmg/payment', [MMGPaymentController::class, 'merchantPayment']);
+        Route::prefix('mmg')->group(function () {
+            Route::post('pay-job/{jobId}', [MMGPaymentController::class, 'payJob']);
+            Route::get('balance', [MMGPaymentController::class, 'balanceCheck']);
+            Route::get('transactions', [MMGPaymentController::class, 'transactionHistory']);
+            Route::get('transaction/{transactionId}', [MMGPaymentController::class, 'transactionLookup']);
+            Route::post('reversal/{transactionId}', [MMGPaymentController::class, 'transactionReversal']);
+            Route::get('payment-status/{paymentId}', [MMGPaymentController::class, 'checkPaymentStatus']);
+        });
+
     });
 
     /*
@@ -104,5 +114,9 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
         // Overview
         Route::get('home-overview', [TruckerOverviewController::class, 'overview']);
+
+        // Notification
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     });
 });

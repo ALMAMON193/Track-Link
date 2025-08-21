@@ -71,7 +71,7 @@ class JobPostSeeder extends Seeder
                 'additional_instructions' => 'Handle with care',
                 'budget_amount' => rand(100, 5000),
                 'currency' => 'USD',
-                'delivery_status' => ['Pending', 'Delayed', 'Complete', 'In_Transport'][array_rand(['Pending', 'Delayed', 'Complete', 'In_Transport'])],
+                'delivery_status' => 'Pending',
                 'tracking_status' => null,
                 'tracking_location' => null,
                 'tracking_date' => null,

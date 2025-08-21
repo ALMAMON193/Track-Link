@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Models\JobPost;
 use Carbon\Carbon;
 
 class Helper
@@ -51,18 +52,55 @@ class Helper
     }
     public static function getTrackingTimeline($jobPost): array
     {
-        $timeline = [];
+        // Predefined steps in correct order
+        $steps = [
+            'Customs Clearance (Origin)',
+            'Departed from Port',
+            'In Transit',
+            'Arrived at Port',
+            'Customs Clearance (Destination)',
+        ];
 
-        if ($jobPost->tracking_status) {
+        $timeline = [];
+        $histories = $jobPost->trackingHistories()->orderBy('datetime')->get()->keyBy('status');
+
+        foreach ($steps as $step) {
+            $history = $histories->get($step);
+
             $timeline[] = [
-                'status' => $jobPost->tracking_status,
-                'location' => $jobPost->tracking_location ?? 'Unknown',
-                'datetime' => $jobPost->tracking_date
-                    ? Carbon::parse($jobPost->tracking_date)->format('M d, Y • h:i A')
+                'status'    => $step,
+                'location'  => $history?->location,
+                'datetime'  => $history?->datetime
+                    ? Carbon::parse($history->datetime)->format('M d, Y • h:i A')
                     : null,
+                'current'   => $jobPost->tracking_time === $step,
+                'completed' => $history !== null,
             ];
         }
-
         return $timeline;
+    }
+
+    //user details and overview
+    public static function calculateJobStats($userId): array
+    {
+        $completedJobs = JobPost::whereHas('applications', function ($q) use ($userId) {
+            $q->where('user_id', $userId)
+                ->where('status', 'accepted');
+        })->where('delivery_status', 'Complete')->count();
+
+        $totalJobs = JobPost::whereHas('applications', function ($q) use ($userId) {
+            $q->where('user_id', $userId);
+        })->count();
+
+        $averageRating = 5.0;
+        // Or: Rating::where('user_id', $userId)->avg('rating') ?? 0;
+
+        $jobSuccess = $totalJobs ? ($completedJobs / $totalJobs) * 100 : 0;
+
+        return [
+            'complete_job' => $completedJobs,
+            'ratting'      => number_format($averageRating, 1),
+            'job_success'  => number_format($jobSuccess, 1),
+        ];
     }
 }

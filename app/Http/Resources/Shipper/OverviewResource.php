@@ -25,6 +25,7 @@ class OverviewResource extends JsonResource
                     'id'                => $job->id,
                     'job_id'            => $job->job_id,
                     'package_name'      => $job->package_name,
+                    'shipment_type'     => $this->shipment_type,
                     'pickup_location'   => "{$job->pickup_city}, {$job->pickup_state}",
                     'delivery_location' => "{$job->delivery_city}, {$job->delivery_state}",
                     'cargo'             => "{$job->quantity} containers, {$job->weight} {$job->weight_type}",

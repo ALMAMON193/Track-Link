@@ -35,12 +35,13 @@ return [
         ],
     ],
     'mmg' => [
+        'merchant_mid' => env('MMG_MERCHANT_MID'),
+        'merchant_password' => env('MMG_MERCHANT_PASSWORD'),
         'resourcetoken_apikey' => env('MMG_RESOURCETOKEN_APIKEY'),
-        'merchant_mid'         => env('MMG_MERCHANT_MID'),
-        'merchant_password'    => env('MMG_MERCHANT_PASSWORD'),
-        'merchant_mkey'        => env('MMG_MERCHANT_MKEY'),
-        'merchant_msecret'     => env('MMG_MERCHANT_MSECRET'),
-        'x_api_key'            => env('MMG_X_API_KEY'),
+        'merchant_mkey' => env('MMG_MKEY'),
+        'merchant_msecret' => env('MMG_MSECRET'),
+        'merchant_client_id' => env('MMG_CLIENT_ID'),
+        'x_api_key' => env('MMG_X_API_KEY'),
     ],
 
 ];

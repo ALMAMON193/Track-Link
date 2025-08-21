@@ -34,6 +34,7 @@ class OverviewResource extends JsonResource
                     'id' => $job->id,
                     'date' => $job->created_at->format('M j, Y'),
                     'package_name' => $job->package_name,
+                    'shipment_type'     => $this->shipment_type,
                     'budget_amount' => number_format($job->budget_amount, 2),
                     'pickup_location' => $job->pickup_city . ', ' . $job->pickup_state,
                     'delivery_location' => $job->delivery_city . ', ' . $job->delivery_state,

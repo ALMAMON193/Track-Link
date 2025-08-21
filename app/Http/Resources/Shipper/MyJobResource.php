@@ -15,6 +15,7 @@ class MyJobResource extends JsonResource
             'job_id'            => $this->job_id,
             'package_name'      => $this->package_name,
             'pickup_location'   => "{$this->pickup_city}, {$this->pickup_state}",
+            'shipment_type'     => $this->shipment_type,
             'delivery_location' => "{$this->delivery_city}, {$this->delivery_state}",
             'cargo'             => "{$this->quantity} containers, {$this->weight} {$this->weight_type}",
             'distance'          => Helper::formatDistance(

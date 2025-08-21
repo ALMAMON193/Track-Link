@@ -46,7 +46,8 @@ class JobPost extends Model
         'delivery_status',
         'tracking_status',
         'tracking_location',
-        'tracking_date'
+        'tracking_date',
+        'is_expired'
     ];
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -56,6 +57,10 @@ class JobPost extends Model
     public function applications()
     {
         return $this->hasMany(JobApplication::class);
+    }
+    public function trackingHistories()
+    {
+        return $this->hasMany(TrackingHistory::class);
     }
 
 }

@@ -16,6 +16,7 @@ class MyJobResource extends JsonResource
             'id'    => $this->id,
             'job_id' => $job->job_id ?? null,
             'package_name' => $job->package_name ?? null,
+            'shipment_type'     => $this->shipment_type,
             'pickup_location' => [
                 'address' => $job->pickup_address ?? null,
                 'city' => $job->pickup_city ?? null,
