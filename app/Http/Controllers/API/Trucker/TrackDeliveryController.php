@@ -27,7 +27,7 @@ class TrackDeliveryController extends Controller
         $perPage = $request->input ('per_page', 10);
         $myJobs = JobApplication::with ('jobPost')
             ->where ('user_id', auth ()->id ())
-            ->where ('status', 'accepted')
+//            ->where ('status', 'accepted')
             ->orderByDesc ('created_at')
             ->paginate ($perPage);
         return $this->sendResponse (

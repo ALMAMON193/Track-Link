@@ -16,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignIdFor(User::class)->constrained()->onDelete('cascade');
             $table->date('date'); // store exact date
-            $table->time('time'); // store exact time slot
+            $table->string('time'); // store exact time slot
             $table->boolean('is_available')->default(true);
             $table->timestamps();
         });

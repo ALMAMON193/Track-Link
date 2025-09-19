@@ -70,15 +70,17 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::get('request-job/{id}', [JobRequestController::class, 'show']);
         Route::get('request-job/{jobId}/users/{userId}', [JobRequestController::class, 'userDetails']);
 
+        // accept Job
+        Route::post('job-accept', [MMGPaymentController::class, 'jobAccept']);
         // MMG Payment
-        Route::prefix('mmg')->group(function () {
-            Route::post('pay-job/{jobId}', [MMGPaymentController::class, 'payJob']);
-            Route::get('balance', [MMGPaymentController::class, 'balanceCheck']);
-            Route::get('transactions', [MMGPaymentController::class, 'transactionHistory']);
-            Route::get('transaction/{transactionId}', [MMGPaymentController::class, 'transactionLookup']);
-            Route::post('reversal/{transactionId}', [MMGPaymentController::class, 'transactionReversal']);
-            Route::get('payment-status/{paymentId}', [MMGPaymentController::class, 'checkPaymentStatus']);
-        });
+//        Route::prefix('mmg')->group(function () {
+//            Route::post('pay-job/{jobId}', [MMGPaymentController::class, 'payJob']);
+//            Route::get('balance', [MMGPaymentController::class, 'balanceCheck']);
+//            Route::get('transactions', [MMGPaymentController::class, 'transactionHistory']);
+//            Route::get('transaction/{transactionId}', [MMGPaymentController::class, 'transactionLookup']);
+//            Route::post('reversal/{transactionId}', [MMGPaymentController::class, 'transactionReversal']);
+//            Route::get('payment-status/{paymentId}', [MMGPaymentController::class, 'checkPaymentStatus']);
+//        });
 
     });
 
