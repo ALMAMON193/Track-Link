@@ -70,6 +70,11 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::get('request-job/{id}', [JobRequestController::class, 'show']);
         Route::get('request-job/{jobId}/users/{userId}', [JobRequestController::class, 'userDetails']);
 
+        // Browse Job
+        Route::get('browse-job', [\App\Http\Controllers\API\Shipper\BrowseTrackerController::class, 'index']);
+        Route::get('browse-job/{id}', [\App\Http\Controllers\API\Shipper\BrowseTrackerController::class, 'show']);
+        Route::post('hire-tracker', [\App\Http\Controllers\API\Shipper\BrowseTrackerController::class, 'sendHireRequest']);
+
         // accept Job
         Route::post('job-accept', [MMGPaymentController::class, 'jobAccept']);
         // MMG Payment

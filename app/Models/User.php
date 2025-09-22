@@ -87,6 +87,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany (JobPost::class);
     }
+    public function setAvailabilities(){
+        return $this->hasMany(SetAvailability::class);
+    }
 
     public function experiencePreference ()
     {
