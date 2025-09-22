@@ -36,11 +36,10 @@ class RequestJobDetailsResource extends JsonResource
                 'quantity'          => $this->quantity,
                 'dimensions'        => "{$this->length}x{$this->width}x{$this->height}",
 
-                'pickup_date'       => $this->pickup_date,
-                'pickup_time'       => $this->pickup_time,
-                'delivery_date'     => $this->delivery_date,
-                'delivery_time'     => $this->delivery_time,
-
+                'pickup_datetime'   => \Carbon\Carbon::parse($this->pickup_date . ' ' . $this->pickup_time)
+                    ->format('Y-m-d, h:i A'),
+                'delivery_datetime' => \Carbon\Carbon::parse($this->delivery_date . ' ' . $this->delivery_time)
+                    ->format('Y-m-d, h:i A'),
                 'is_urgent_shipment'=> (bool)$this->is_urgent_shipment,
                 'flexible_with_pickup' => (bool)$this->flexible_with_pickup,
                 'temperature_controlled' => (bool)$this->temperature_controlled,
