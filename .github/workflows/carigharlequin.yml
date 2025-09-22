@@ -1,25 +1,24 @@
-name: Deploy Project to Our Server
-
+name: "Upload to FTP"
 on:
   push:
     branches:
-      - master
-
+      - main
 jobs:
-  FTP-Deploy-Action:
-    name: FTP Deployment
+  web-deploy:
+    name: 🎉 Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - name: 🚚 Get latest code
+        uses: actions/checkout@v2.3.2
         with:
+          lfs: true
           fetch-depth: 2
-
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      - name: Sync files
+        uses: SamKirkland/FTP-Deploy-Action@4.1.0
         with:
-          server: 148.230.83.32
-          username: backend_ftp
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-
-
+          exclude: "[**/.git*/**, **/node_modules/**, **/build/, .README.MD, .gitignore]"
+          protocol: ftps
+          log-level: verbose
