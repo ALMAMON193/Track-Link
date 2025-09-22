@@ -60,14 +60,12 @@ class JobRequestController extends Controller
             'User details retrieved successfully.'
         );
     }
-
     //reject job
     public function jobReject(Request $request, $jobId, $userId)
     {
         $request->validate([
             'rejection_reason' => 'nullable|string|max:255',
         ]);
-
         $application = JobApplication::where('job_post_id', $jobId)
             ->where('user_id', $userId)
             ->firstOrFail();
@@ -123,5 +121,4 @@ class JobRequestController extends Controller
 
         return $this->sendResponse([], 'Applicant accepted successfully.');
     }
-
 }
