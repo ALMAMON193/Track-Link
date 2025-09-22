@@ -23,10 +23,7 @@ jobs:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          exclude: |
-            **/node_modules/**
-            **/.git**/
-            config/cors.php
+
 
 
 
