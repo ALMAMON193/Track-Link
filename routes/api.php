@@ -69,14 +69,15 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::get('request-job', [JobRequestController::class, 'index']);
         Route::get('request-job/{id}', [JobRequestController::class, 'show']);
         Route::get('request-job/{jobId}/users/{userId}', [JobRequestController::class, 'userDetails']);
+        Route::post('reject-job/{jobId}/users/{userId}', [JobRequestController::class, 'jobReject']);
+        Route::post('accept-job/{jobId}/users/{userId}', [JobRequestController::class, 'jobAccept']);
+
 
         // Browse Job
         Route::get('browse-job', [\App\Http\Controllers\API\Shipper\BrowseTrackerController::class, 'index']);
         Route::get('browse-job/{id}', [\App\Http\Controllers\API\Shipper\BrowseTrackerController::class, 'show']);
         Route::post('hire-tracker', [\App\Http\Controllers\API\Shipper\BrowseTrackerController::class, 'sendHireRequest']);
 
-        // accept Job
-        Route::post('job-accept', [MMGPaymentController::class, 'jobAccept']);
         // MMG Payment
 //        Route::prefix('mmg')->group(function () {
 //            Route::post('pay-job/{jobId}', [MMGPaymentController::class, 'payJob']);

@@ -18,46 +18,7 @@ class MMGPaymentController extends Controller
     use ApiResponse;
 //    protected MMGPaymentService $paymentService;
 
-    public function jobAccept(Request $request)
-    {
-        $request->validate([
-            'job_post_id' => 'required|exists:job_posts,id',
-            'user_id'     => 'required|exists:users,id',
-        ]);
 
-        $shipperId = auth()->id();
-
-        // Ensure the logged-in user owns this job post
-        $jobPost = JobPost::where('id', $request->job_post_id)
-            ->where('user_id', $shipperId)
-            ->first();
-
-        if (!$jobPost) {
-            return $this->sendError('You are not authorized to accept this job.', [], 403);
-        }
-
-        // Find application for this applicant
-        $application = JobApplication::where('user_id', $request->user_id)
-            ->where('job_post_id', $request->job_post_id)
-            ->first();
-
-        if (!$application) {
-            return $this->sendError('Application not found.');
-        }
-
-        // Update applicant to accepted
-        $application->update([
-            'status'      => 'accepted',
-            'assigned_at' => now(),
-        ]);
-
-        // Reject all other applicants for this job
-        JobApplication::where('job_post_id', $request->job_post_id)
-            ->where('id', '!=', $application->id)
-            ->update(['status' => 'rejected']);
-
-        return $this->sendResponse([], 'Applicant accepted successfully.');
-    }
 
 //    public function __construct(MMGPaymentService $paymentService)
 //    {
