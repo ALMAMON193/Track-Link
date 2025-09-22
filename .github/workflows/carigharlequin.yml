@@ -20,5 +20,5 @@ jobs:
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
           exclude: "[**/.git*/**, **/node_modules/**, **/build/, .README.MD, .gitignore]"
-          protocol: ftps
+          protocol: ftp
           log-level: verbose
