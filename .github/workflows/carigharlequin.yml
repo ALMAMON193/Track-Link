@@ -22,3 +22,7 @@ jobs:
           username: backend_ftp
           password: "6dTa2Vp1Bf8mMzoAJjK1"
           protocol: ftps
+          port: 21
+          passive: true
+          timeout: 60000
+          server-dir: /
