@@ -31,15 +31,15 @@ class OverviewResource extends JsonResource
 
             'available_jobs' => $this->available_jobs->map(function ($job) {
                 return [
-                    'id' => $job->id,
-                    'date' => $job->created_at->format('M j, Y'),
-                    'package_name' => $job->package_name,
-                    'shipment_type'     => $this->shipment_type,
-                    'budget_amount' => number_format($job->budget_amount, 2),
-                    'pickup_location' => $job->pickup_city . ', ' . $job->pickup_state,
-                    'delivery_location' => $job->delivery_city . ', ' . $job->delivery_state,
-                    'distance' => '574 km',
-                    'cargo' => "{$job->quantity} containers, {$job->weight} {$job->weight_type}",
+                    'id'                    => $job->id,
+                    'date'                  => $job->created_at->format('M j, Y'),
+                    'package_name'          => $job->package_name,
+                    'shipment_type'         => $job->shipment_type,
+                    'budget_amount'         => number_format($job->budget_amount, 2),
+                    'pickup_location'       => $job->pickup_city . ', ' . $job->pickup_state,
+                    'delivery_location'     => $job->delivery_city . ', ' . $job->delivery_state,
+                    'distance'              => '574 km',
+                    'cargo'                 => "{$job->quantity} containers, {$job->weight} {$job->weight_type}",
                 ];
             }),
 
