@@ -21,3 +21,4 @@ jobs:
           server: 148.230.83.32
           username: backend_ftp
           password: "6dTa2Vp1Bf8mMzoAJjK1"
+          protocol: ftps
