@@ -46,4 +46,16 @@ class BrowseJobController extends Controller
         ]);
         return $this->sendResponse([],__('Successfully Applied for this job.'));
     }
+
+    // browse  job details
+    public function jobDetails($id)
+    {
+        $jobDetails = JobPost::where('delivery_status', 'Pending')
+            ->where('id', $id)
+            ->firstOrFail();
+        return $this->sendResponse(
+            new BrowseJobResource($jobDetails),
+            __('Fetch Job Details')
+        );
+    }
 }

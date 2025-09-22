@@ -108,6 +108,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         // Browse Jobs
         Route::get('browse-job', [BrowseJobController::class, 'browseJob']);
         Route::post('apply-job', [BrowseJobController::class, 'applyJob']);
+        Route::get('browse-job-details/{id}', [BrowseJobController::class, 'jobDetails']);
 
         // Set Availability
         Route::get('set-availability', [SetAvailabilityController::class, 'index']);
