@@ -81,7 +81,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 //            Route::post('reversal/{transactionId}', [MMGPaymentController::class, 'transactionReversal']);
 //            Route::get('payment-status/{paymentId}', [MMGPaymentController::class, 'checkPaymentStatus']);
 //        });
-
     });
 
     /*

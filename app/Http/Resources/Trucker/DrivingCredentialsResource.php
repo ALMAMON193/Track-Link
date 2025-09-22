@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources\Trucker;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class DrivingCredentialsResource extends JsonResource
@@ -11,10 +10,12 @@ class DrivingCredentialsResource extends JsonResource
     {
         return [
             'id'              => $this->id,
-            'license_number'   => $this->license_number,
-            'state_of_issue'   => $this->state_of_issue,
-            'expiration_date'  => $this->expiration_date,
-            'driver_license'   => $this->driver_license ? asset('storage/' . $this->driver_license) : null,
+            'license_number'  => $this->license_number,
+            'state_of_issue'  => $this->state_of_issue,
+            'expiration_date' => $this->expiration_date,
+            'driver_license'  => !empty($this->driver_license)
+                ? asset('storage/' . $this->driver_license)
+                : '',
         ];
     }
 }

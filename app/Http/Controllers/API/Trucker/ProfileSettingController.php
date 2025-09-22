@@ -15,6 +15,7 @@ use App\Models\ExperiencePreference;
 use App\Models\PersonalInformation;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -95,31 +96,28 @@ class ProfileSettingController extends Controller
     {
         $user = auth()->user();
 
-        // Get existing or new driver detail model
         $driverDetail = $user->driverDetail ?? new DriverDetail(['user_id' => $user->id]);
 
-        // Keep track of old status
-        $oldStatus = $driverDetail->status ?? 'pending'; // default fallback
+        $oldStatus = $driverDetail->status ?? 'pending';
 
-        // Update fields from request
         $driverDetail->license_number = $request->license_number;
         $driverDetail->state_of_issue = $request->state_of_issue;
-        $driverDetail->expiration_date = $request->expiration_date;
 
-        // Handle file upload for driver_license
+        // Convert date to proper format
+        if ($request->expiration_date) {
+            $driverDetail->expiration_date = Carbon::createFromFormat('m/d/Y', $request->expiration_date)
+                ->format('Y-m-d');
+        }
+
         if ($request->hasFile('driver_license')) {
-            // Delete old file if exists
             if ($driverDetail->driver_license && Storage::disk('public')->exists($driverDetail->driver_license)) {
                 Storage::disk('public')->delete($driverDetail->driver_license);
             }
-            // Store new file and save path
             $path = $request->file('driver_license')->store('driver_licenses', 'public');
             $driverDetail->driver_license = $path;
         }
 
-        // Check if any attribute is dirty (changed)
         if ($driverDetail->isDirty()) {
-            // If status is verified, change it to unverified
             if ($oldStatus === 'verified') {
                 $driverDetail->status = 'unverified';
             }
