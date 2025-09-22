@@ -1,27 +1,31 @@
-name: "Upload to FTP"
+name: Deploy Project to Our Servers
+
 on:
   push:
     branches:
-      - master
+      - main
+
 jobs:
-  web-deploy:
-    name: 🎉 Deploy
+  FTP-Deploy-Action:
+    name: FTP Deployment to Client Server
     runs-on: ubuntu-latest
     steps:
-      - name: Get latest code
-        uses: actions/checkout@v2.3.2
+      - name: Checkout Repository
+
+        uses: actions/checkout@v4
         with:
-          lfs: true
           fetch-depth: 2
-      - name: Sync files
-        uses: SamKirkland/FTP-Deploy-Action@4.1.0
+
+      # ➤ Deploy to Client Server
+      - name: Deploy to Client Server
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
         with:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftp
-          max-uploads: 1
-          log-level: verbose
+
+
+
 
 
 
