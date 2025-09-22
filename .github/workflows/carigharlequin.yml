@@ -2,7 +2,7 @@ name: "Upload to FTP"
 on:
   push:
     branches:
-      - main
+      - master
 jobs:
   web-deploy:
     name: 🎉 Deploy
