@@ -20,5 +20,8 @@ jobs:
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_PASSWORD }}
           protocol: ftp
+          max-uploads: 1
+          log-level: verbose
+
 
 
