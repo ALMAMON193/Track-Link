@@ -21,8 +21,5 @@ jobs:
           server: 148.230.83.32
           username: backend_ftp
           password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          port: 21
-          passive: true
 
 
