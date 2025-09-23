@@ -7,35 +7,43 @@ use App\Helpers\Helper;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Trucker\MyJobResource;
 use App\Http\Resources\Trucker\UpdateDeliveryStatusResource;
-use App\Http\Resources\Trucker\UpdateTrackingStatusResource;
 use App\Models\JobApplication;
 use App\Models\JobPost;
-use App\Models\User;
 use App\Notifications\OrderStatusUpdated;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
+
 
 class TrackDeliveryController extends Controller
 {
     use ApiResponse;
 
-    public function index (Request $request)
+
+    /**
+     * List all jobs assigned to the authenticated trucker
+     */
+    public function index(Request $request)
     {
-        $perPage = $request->input ('per_page', 10);
-        $myJobs = JobApplication::with ('jobPost')
-            ->where ('user_id', auth ()->id ())
-//            ->where ('status', 'accepted')
-            ->orderByDesc ('created_at')
-            ->paginate ($perPage);
-        return $this->sendResponse (
-            MyJobResource::collection ($myJobs),
-            __ ('Fetch My Jobs')
+        $perPage = $request->input('per_page', 10);
+
+        $myJobs = JobApplication::with('jobPost')
+            ->where('user_id', auth()->id())
+            // ->where('status', 'accepted')
+            ->orderByDesc('created_at')
+            ->paginate($perPage);
+
+        return $this->sendResponse(
+            MyJobResource::collection($myJobs),
+            __('Fetch My Jobs')
         );
     }
-    //change a delivery status
+
+
+    /**
+     * Update delivery status for a specific job
+     */
     public function updateDeliveryStatus(Request $request, $jobPostId)
     {
         try {
@@ -43,19 +51,26 @@ class TrackDeliveryController extends Controller
             $validated = $request->validate([
                 'delivery_status' => 'required|in:Pending,Delayed,Complete,In_Transport',
             ]);
+
             // Find JobPost
             $jobPost = JobPost::findOrFail($jobPostId);
+
             // Update delivery status
             $jobPost->delivery_status = $validated['delivery_status'];
             $jobPost->save();
-            // Send notification
+
+            // Send notification to job owner
             if ($jobPost->user) {
-                $jobPost->user->notify(new OrderStatusUpdated($jobPost, 'Delivery', $validated['delivery_status']));
+                $jobPost->user->notify(
+                    new OrderStatusUpdated($jobPost, 'Delivery', $validated['delivery_status'])
+                );
             }
+
             return $this->sendResponse(
                 new UpdateDeliveryStatusResource($jobPost),
                 __('Delivery Status Updated Successfully.')
             );
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             return $this->sendError('Validation Error', $e->errors(), 422);
 
@@ -63,43 +78,49 @@ class TrackDeliveryController extends Controller
             return $this->sendError('Job Post Not Found');
 
         } catch (\Exception $e) {
-            Log::error('Delivery Status Update Failed: '.$e->getMessage(), ['jobPostId' => $jobPostId]);
+            Log::error(
+                'Delivery Status Update Failed: '.$e->getMessage(),
+                ['jobPostId' => $jobPostId]
+            );
             return $this->sendError('Something went wrong. Please try again later.');
         }
     }
-    //update tracking status
+
+
+    /**
+     * Update tracking status for a specific job
+     */
     public function updateTrackingStatus(Request $request, $jobPostId)
     {
         try {
             $validated = $request->validate([
                 'tracking_time_status' => 'required|in:Customs Clearance (Origin),Departed from Port,In Transit,Arrived at Port,Customs Clearance (Destination)',
-                'location' => 'nullable|string',
-                'datetime' => 'nullable|date'
+                'location'             => 'nullable|string',
+                'datetime'             => 'nullable|date',
             ]);
 
             $jobPost = JobPost::findOrFail($jobPostId);
 
             // Save latest status on JobPost
-            $jobPost->tracking_time = $validated['tracking_time_status'];
+            $jobPost->tracking_time     = $validated['tracking_time_status'];
             $jobPost->tracking_location = $validated['location'] ?? null;
-            $jobPost->tracking_date = $validated['datetime'] ?? now();
+            $jobPost->tracking_date     = $validated['datetime'] ?? now();
             $jobPost->save();
 
-            // Insert into tracking history table
+            // Insert into tracking history
             $jobPost->trackingHistories()->create([
                 'status'   => $validated['tracking_time_status'],
                 'location' => $validated['location'] ?? null,
                 'datetime' => $validated['datetime'] ?? now(),
             ]);
 
-            // Send notification
+            // Send notification to job owner
             if ($jobPost->user) {
-                $jobPost->user->notify(new OrderStatusUpdated(
-                    $jobPost,
-                    'Tracking',
-                    $validated['tracking_time_status']
-                ));
+                $jobPost->user->notify(
+                    new OrderStatusUpdated($jobPost, 'Tracking', $validated['tracking_time_status'])
+                );
             }
+
             return $this->sendResponse(
                 Helper::getTrackingTimeline($jobPost),
                 __('Tracking Status Updated Successfully.')
@@ -107,10 +128,15 @@ class TrackDeliveryController extends Controller
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             return $this->sendError('Validation Error', $e->errors(), 422);
+
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return $this->sendError('Job Post Not Found');
+
         } catch (\Exception $e) {
-            Log::error('Tracking Status Update Failed: '.$e->getMessage(), ['jobPostId' => $jobPostId]);
+            Log::error(
+                'Tracking Status Update Failed: '.$e->getMessage(),
+                ['jobPostId' => $jobPostId]
+            );
             return $this->sendError('Something went wrong. Please try again later.');
         }
     }

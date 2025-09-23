@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Trucker;
 
+use App\Helpers\Helper;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class DrivingCredentialsResource extends JsonResource
@@ -13,9 +14,7 @@ class DrivingCredentialsResource extends JsonResource
             'license_number'  => $this->license_number,
             'state_of_issue'  => $this->state_of_issue,
             'expiration_date' => $this->expiration_date,
-            'driver_license'  => !empty($this->driver_license)
-                ? asset('storage/' . $this->driver_license)
-                : '',
+            'driver_license'  => Helper::generateURL($this->driver_license ?? '')
         ];
     }
 }

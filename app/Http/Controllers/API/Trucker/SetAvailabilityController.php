@@ -8,10 +8,15 @@ use App\Models\SetAvailability;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 
+
 class SetAvailabilityController extends Controller
 {
     use ApiResponse;
 
+
+    /**
+     * List all availabilities for authenticated trucker
+     */
     public function index()
     {
         $availabilities = SetAvailability::where('user_id', auth()->id())
@@ -25,6 +30,10 @@ class SetAvailabilityController extends Controller
         );
     }
 
+
+    /**
+     * Store or update availability for a given date and time
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -49,4 +58,5 @@ class SetAvailabilityController extends Controller
             'Availability saved successfully'
         );
     }
+
 }

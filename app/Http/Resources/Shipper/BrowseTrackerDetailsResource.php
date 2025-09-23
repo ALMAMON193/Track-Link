@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Shipper;
 
+use App\Helpers\Helper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -13,6 +14,7 @@ class BrowseTrackerDetailsResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'avatar' =>$this->personalInformation->avatar ? Helper::generateURL($this->personalInformation->avatar) : '',
             'about' => $this->personalInformation->about ?? null,
             'ratting' => [
                 'rating' => $this->rating ?? 0,

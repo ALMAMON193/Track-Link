@@ -16,9 +16,14 @@ use Illuminate\Support\Facades\Auth;
 class JobRequestController extends Controller
 {
     use ApiResponse;
+
+    /**
+     * List all jobs created by the logged-in shipper with applicants.
+     */
     public function index()
     {
         $user = Auth::user();
+
         $jobsWithApplications = JobPost::with('applications.user')
             ->where('user_id', $user->id)
             ->whereHas('applications')
@@ -30,57 +35,71 @@ class JobRequestController extends Controller
             'Jobs with applicants retrieved successfully.'
         );
     }
+
+    /**
+     * Show a specific job with its applicants.
+     */
     public function show($id)
     {
         $job = JobPost::with(['applications.user'])->findOrFail($id);
+
         return $this->sendResponse(
             new RequestJobDetailsResource($job),
             __('Job details retrieved successfully.')
         );
     }
-    //details user
+
+    /**
+     * Show detailed information about a specific applicant for a job.
+     */
     public function userDetails($jobId, $userId)
     {
-        // Load job with applications and nested user relations
         $job = JobPost::with([
             'applications.user.driverDetail',
             'applications.user.experiencePreference'
-        ])->findOrFail($jobId);
+        ])
+            ->findOrFail($jobId);
 
-        // Find the specific application for this user
         $application = $job->applications->firstWhere('user_id', $userId);
 
         if (!$application) {
             return $this->sendResponse(null, 'Application not found', 404);
         }
+
         $stats = Helper::calculateJobStats($userId);
-        // Pass both user and application to the resource
+
         return $this->sendResponse(
-            new UserDetailsResource($application->user, $application,$stats),
+            new UserDetailsResource($application->user, $application, $stats),
             'User details retrieved successfully.'
         );
     }
-    //reject job
+
+    /**
+     * Reject a job application with optional reason.
+     */
     public function jobReject(Request $request, $jobId, $userId)
     {
         $request->validate([
             'rejection_reason' => 'nullable|string|max:255',
         ]);
+
         $application = JobApplication::where('job_post_id', $jobId)
             ->where('user_id', $userId)
             ->firstOrFail();
 
-        // Save reason before delete
         $application->update([
-            'status' => 'rejected',
+            'status'           => 'rejected',
             'rejection_reason' => $request->rejection_reason,
         ]);
 
-        // Now delete the application
         $application->delete();
 
         return $this->sendResponse([], __('Job application rejected & removed successfully.'));
     }
+
+    /**
+     * Accept a job applicant and reject all others.
+     */
     public function jobAccept(Request $request)
     {
         $request->validate([
@@ -90,7 +109,6 @@ class JobRequestController extends Controller
 
         $shipperId = auth()->id();
 
-        // Ensure the logged-in user owns this job post
         $jobPost = JobPost::where('id', $request->job_post_id)
             ->where('user_id', $shipperId)
             ->first();
@@ -99,7 +117,6 @@ class JobRequestController extends Controller
             return $this->sendError('You are not authorized to accept this job.', [], 403);
         }
 
-        // Find application for this applicant
         $application = JobApplication::where('user_id', $request->user_id)
             ->where('job_post_id', $request->job_post_id)
             ->first();
@@ -108,13 +125,11 @@ class JobRequestController extends Controller
             return $this->sendError('Application not found.');
         }
 
-        // Update applicant to accepted
         $application->update([
             'status'      => 'accepted',
             'assigned_at' => now(),
         ]);
 
-        // Reject all other applicants for this job
         JobApplication::where('job_post_id', $request->job_post_id)
             ->where('id', '!=', $application->id)
             ->update(['status' => 'rejected']);

@@ -7,6 +7,8 @@ use App\Http\Controllers\API\Shipper\MyJobController;
 use App\Http\Controllers\API\Shipper\PostJobController;
 use App\Http\Controllers\API\Shipper\OverviewController as ShipperOverviewController;
 use App\Http\Controllers\API\Shipper\ProfileSettingController as ShipperProfileController;
+use App\Http\Controllers\API\Shipper\BrowseTrackerController;
+
 use App\Http\Controllers\API\Trucker\BrowseJobController;
 use App\Http\Controllers\API\Trucker\NotificationController;
 use App\Http\Controllers\API\Trucker\OverviewController as TruckerOverviewController;
@@ -17,114 +19,121 @@ use App\Http\Controllers\API\Trucker\TrackDeliveryController;
 use Illuminate\Support\Facades\Route;
 
 /*
-|--------------------------------------------------------------------------
-| Public Routes
-|--------------------------------------------------------------------------
+|--------------------------------------------------------------------------|
+| Public Routes                                                            |
+|--------------------------------------------------------------------------|
 */
 Route::prefix('auth')->group(function () {
-    Route::post('register', [AuthApiController::class, 'registerApi']);
-    Route::post('login', [AuthApiController::class, 'loginApi']);
-    Route::post('forgot-password', [AuthApiController::class, 'forgotPasswordApi']);
-    Route::post('reset-password', [AuthApiController::class, 'resetPasswordApi']);
-    Route::post('resend-verification-email', [AuthApiController::class, 'resendVerificationEmailApi']);
+
+    Route::post('register',                                 [AuthApiController::class, 'registerApi']);
+    Route::post('login',                                    [AuthApiController::class, 'loginApi']);
+    Route::post('forgot-password',                          [AuthApiController::class, 'forgotPasswordApi']);
+    Route::post('reset-password',                           [AuthApiController::class, 'resetPasswordApi']);
+    Route::post('resend-verification-email',                [AuthApiController::class, 'resendVerificationEmailApi']);
+
 });
 
 // Email verification
-Route::get('/verify-email/{id}/{hash}', [AuthApiController::class, 'verifyEmailApi'])
+Route::get('/verify-email/{id}/{hash}',                     [AuthApiController::class, 'verifyEmailApi'])
     ->middleware('signed')
     ->name('verification.verify');
 
+
 /*
-|--------------------------------------------------------------------------
-| Authenticated & Verified Routes
-|--------------------------------------------------------------------------
+|--------------------------------------------------------------------------|
+| Authenticated & Verified Routes                                         |
+|--------------------------------------------------------------------------|
 */
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     // Logout
-    Route::post('auth/logout', [AuthApiController::class, 'logoutApi']);
+    Route::post('auth/logout',                              [AuthApiController::class, 'logoutApi']);
 
     /*
-    |--------------------------------------------------------------------------
-    | Shipper Routes
-    |--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------|
+    | Shipper Routes                                                           |
+    |--------------------------------------------------------------------------|
     */
     Route::prefix('shipper')->middleware('shipper')->group(function () {
 
         // Jobs
-        Route::get('my-jobs', [MyJobController::class, 'myJobs']);
-        Route::post('post-job', [PostJobController::class, 'postJob']);
-        Route::get('post-job/{id}', [PostJobController::class, 'postJobDetails']);
+        Route::get('my-jobs',                               [MyJobController::class, 'myJobs']);
+        Route::post('post-job',                             [PostJobController::class, 'postJob']);
+        Route::get('post-job/{id}',                         [PostJobController::class, 'postJobDetails']);
 
         // Overview
-        Route::get('overview', [ShipperOverviewController::class, 'shipperOverview']);
+        Route::get('overview',                              [ShipperOverviewController::class, 'shipperOverview']);
 
         // Profile Settings
-        Route::get('personal-info', [ShipperProfileController::class, 'personalInformation']);
-        Route::post('personal-info/update', [ShipperProfileController::class, 'updatePersonalInformation']);
-        Route::post('password/update', [ShipperProfileController::class, 'updatePassword']);
-        Route::post('delete/account', [ShipperProfileController::class, 'deleteAccount']);
+        Route::get('personal-info',                         [ShipperProfileController::class, 'personalInformation']);
+        Route::post('personal-info/update',                 [ShipperProfileController::class, 'updatePersonalInformation']);
+        Route::post('password/update',                      [ShipperProfileController::class, 'updatePassword']);
+        Route::post('delete/account',                       [ShipperProfileController::class, 'deleteAccount']);
 
         // Job Requests
-        Route::get('request-job', [JobRequestController::class, 'index']);
-        Route::get('request-job/{id}', [JobRequestController::class, 'show']);
-        Route::get('request-job/{jobId}/users/{userId}', [JobRequestController::class, 'userDetails']);
-        Route::post('reject-job/{jobId}/users/{userId}', [JobRequestController::class, 'jobReject']);
-        Route::post('accept-job/{jobId}/users/{userId}', [JobRequestController::class, 'jobAccept']);
-
+        Route::get('request-job',                           [JobRequestController::class, 'index']);
+        Route::get('request-job/{id}',                      [JobRequestController::class, 'show']);
+        Route::get('request-job/{jobId}/users/{userId}',    [JobRequestController::class, 'userDetails']);
+        Route::post('reject-job/{jobId}/users/{userId}',    [JobRequestController::class, 'jobReject']);
+        Route::post('accept-job/{jobId}/users/{userId}',    [JobRequestController::class, 'jobAccept']);
 
         // Browse Job
-        Route::get('browse-job', [\App\Http\Controllers\API\Shipper\BrowseTrackerController::class, 'index']);
-        Route::get('browse-job/{id}', [\App\Http\Controllers\API\Shipper\BrowseTrackerController::class, 'show']);
-        Route::post('hire-tracker', [\App\Http\Controllers\API\Shipper\BrowseTrackerController::class, 'sendHireRequest']);
+        Route::get('browse-job',                            [BrowseTrackerController::class, 'index']);
+        Route::get('browse-job/{id}',                       [BrowseTrackerController::class, 'show']);
+        Route::post('hire-tracker',                         [BrowseTrackerController::class, 'sendHireRequest']);
 
-        // MMG Payment
-//        Route::prefix('mmg')->group(function () {
-//            Route::post('pay-job/{jobId}', [MMGPaymentController::class, 'payJob']);
-//            Route::get('balance', [MMGPaymentController::class, 'balanceCheck']);
-//            Route::get('transactions', [MMGPaymentController::class, 'transactionHistory']);
-//            Route::get('transaction/{transactionId}', [MMGPaymentController::class, 'transactionLookup']);
-//            Route::post('reversal/{transactionId}', [MMGPaymentController::class, 'transactionReversal']);
-//            Route::get('payment-status/{paymentId}', [MMGPaymentController::class, 'checkPaymentStatus']);
-//        });
+
+        // MMG Payment (commented out)
+        // Route::prefix('mmg')->group(function () {
+        //     Route::post('pay-job/{jobId}', [MMGPaymentController::class, 'payJob']);
+        //     Route::get('balance', [MMGPaymentController::class, 'balanceCheck']);
+        //     Route::get('transactions', [MMGPaymentController::class, 'transactionHistory']);
+        //     Route::get('transaction/{transactionId}', [MMGPaymentController::class, 'transactionLookup']);
+        //     Route::post('reversal/{transactionId}', [MMGPaymentController::class, 'transactionReversal']);
+        //     Route::get('payment-status/{paymentId}', [MMGPaymentController::class, 'checkPaymentStatus']);
+        // });
+
     });
 
+
     /*
-    |--------------------------------------------------------------------------
-    | Trucker Routes
-    |--------------------------------------------------------------------------
+    |--------------------------------------------------------------------------|
+    | Trucker Routes                                                          |
+    |--------------------------------------------------------------------------|
     */
     Route::prefix('trucker')->middleware('trucker')->group(function () {
 
         // Jobs
-        Route::get('my-jobs', [TrackDeliveryController::class, 'index']);
-        Route::post('job-posts/{id}/delivery-status', [TrackDeliveryController::class, 'updateDeliveryStatus']);
-        Route::post('job-posts/{id}/tracking-status', [TrackDeliveryController::class, 'updateTrackingStatus']);
+        Route::get('my-jobs',                                   [TrackDeliveryController::class, 'index']);
+        Route::post('job-posts/{id}/delivery-status',           [TrackDeliveryController::class, 'updateDeliveryStatus']);
+        Route::post('job-posts/{id}/tracking-status',           [TrackDeliveryController::class, 'updateTrackingStatus']);
 
         // Profile Settings
-        Route::get('personal-info', [ProfileSettingController::class, 'personalInformation']);
-        Route::post('personal-info/update', [ProfileSettingController::class, 'updatePersonalInformation']);
-        Route::get('experience-skill', [ProfileSettingController::class, 'experienceAndSkill']);
-        Route::post('experience-skill/update', [ProfileSettingController::class, 'updateExperienceAndSkill']);
-        Route::get('driving-credential', [ProfileSettingController::class, 'drivingCredential']);
-        Route::post('driving-credential/update', [ProfileSettingController::class, 'updateDrivingCredential']);
-        Route::post('password/update', [ProfileSettingController::class, 'updatePassword']);
-        Route::post('delete/account', [ProfileSettingController::class, 'deleteAccount']);
+        Route::get('personal-info',                             [ProfileSettingController::class, 'personalInformation']);
+        Route::post('personal-info/update',                     [ProfileSettingController::class, 'updatePersonalInformation']);
+        Route::get('experience-skill',                          [ProfileSettingController::class, 'experienceAndSkill']);
+        Route::post('experience-skill/update',                  [ProfileSettingController::class, 'updateExperienceAndSkill']);
+        Route::get('driving-credential',                        [ProfileSettingController::class, 'drivingCredential']);
+        Route::post('driving-credential/update',                [ProfileSettingController::class, 'updateDrivingCredential']);
+        Route::post('password/update',                          [ProfileSettingController::class, 'updatePassword']);
+        Route::post('delete/account',                           [ProfileSettingController::class, 'deleteAccount']);
 
         // Browse Jobs
-        Route::get('browse-job', [BrowseJobController::class, 'browseJob']);
-        Route::post('apply-job', [BrowseJobController::class, 'applyJob']);
-        Route::get('browse-job-details/{id}', [BrowseJobController::class, 'jobDetails']);
+        Route::get('browse-job',                                  [BrowseJobController::class, 'browseJob']);
+        Route::post('apply-job',                                  [BrowseJobController::class, 'applyJob']);
+        Route::get('browse-job-details/{id}',                     [BrowseJobController::class, 'jobDetails']);
 
         // Set Availability
-        Route::get('set-availability', [SetAvailabilityController::class, 'index']);
-        Route::post('set-availability/store', [SetAvailabilityController::class, 'store']);
+        Route::get('set-availability',                             [SetAvailabilityController::class, 'index']);
+        Route::post('set-availability/store',                      [SetAvailabilityController::class, 'store']);
 
         // Overview
-        Route::get('home-overview', [TruckerOverviewController::class, 'overview']);
+        Route::get('home-overview',                                 [TruckerOverviewController::class, 'overview']);
 
         // Notification
-        Route::get('/notifications', [NotificationController::class, 'index']);
-        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+        Route::get('/notifications',                                  [NotificationController::class, 'index']);
+        Route::post('/notifications/{id}/read',                       [NotificationController::class, 'markAsRead']);
+
     });
+
 });

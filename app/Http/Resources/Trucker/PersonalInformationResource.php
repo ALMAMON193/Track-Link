@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Trucker;
 
+use App\Helpers\Helper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,7 +19,8 @@ class PersonalInformationResource extends JsonResource
             'address' => $this->address ?? '',
             'phone' => $this->phone ?? '',
             'about' => $this->about ?? '',
-            'avatar' => $this->avatar ? asset('storage/' . $this->avatar) : '',
+            'avatar' => $this->avatar ? Helper::generateURL($this->avatar) : '',
+
         ];
     }
 }

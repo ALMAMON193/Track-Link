@@ -9,20 +9,22 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
-
 class MyJobController extends Controller
 {
     use ApiResponse;
 
+    /**
+     * Retrieve logged-in shipper's jobs with overview stats.
+     */
     public function myJobs(Request $request)
     {
         $perPage = $request->input('per_page', 10);
         $userId  = auth()->id();
 
-        // Base query to avoid repeating "where user_id = $userId"
+        // Base query for reusability
         $baseQuery = JobPost::where('user_id', $userId);
 
-        // Overview calculations
+        // Overview statistics
         $overview = [
             'total_job_post'                => (clone $baseQuery)->count(),
             'total_job_post_this_week'      => (clone $baseQuery)
@@ -44,23 +46,23 @@ class MyJobController extends Controller
                     Carbon::now()->endOfMonth()
                 ])
                 ->count(),
-            'total_spend_amount'            => "2000.00",  // You can calculate dynamically if needed
-            'total_spend_amount_last_month' => " - 8%",    // You can calculate dynamically if needed
+            'total_spend_amount'            => "2000.00",   // Replace with dynamic calculation if needed
+            'total_spend_amount_last_month' => " - 8%",     // Replace with dynamic calculation if needed
         ];
 
-        // Paginated jobs excluding completed jobs
+        // Paginated jobs excluding completed ones
         $myJobs = (clone $baseQuery)
             ->where('delivery_status', '!=', 'Complete')
             ->latest()
             ->paginate($perPage);
 
-        // Return combined overview and jobs in a single API response
+        // Combined response
         return $this->sendResponse(
             [
-                    'overview' => $overview,
-                'my_jobs'  => MyJobResource::collection($myJobs)
+                'overview' => $overview,
+                'my_jobs'  => MyJobResource::collection($myJobs),
             ],
-            __('My jobs fetched successfully')
+            __('My jobs fetched successfully.')
         );
     }
 }

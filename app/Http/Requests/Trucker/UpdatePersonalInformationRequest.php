@@ -16,10 +16,6 @@ class UpdatePersonalInformationRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:50',
-            'email' => [
-                'required',
-                'email',
-                Rule::unique('users')->ignore(auth()->id())],
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
             'city' => 'nullable|string|max:50',

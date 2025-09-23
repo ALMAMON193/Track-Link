@@ -5,11 +5,11 @@ namespace App\Http\Controllers\API\Shipper;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Shipper\BrowseTrackerRequest;
 use App\Http\Resources\Shipper\BrowseTrackerDetailsResource;
+use App\Http\Resources\Shipper\BrowseTrackerResource;
 use App\Models\HireRequest;
 use App\Models\User;
 use App\Notifications\TrackerHiredNotification;
 use App\Traits\ApiResponse;
-use App\Http\Resources\Shipper\BrowseTrackerResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
@@ -17,11 +17,14 @@ class BrowseTrackerController extends Controller
 {
     use ApiResponse;
 
+    /**
+     * Display a paginated list of verified truckers.
+     */
     public function index(Request $request)
     {
         $perPage = $request->input('per_page', 10); // Default 10 per page
 
-        $drivers = User::with(['experiencePreference', 'driverDetail'])
+        $drivers = User::with(['experiencePreference', 'driverDetail','personalInformation'])
             ->where('user_type', 'trucker')
             ->where('status', 'verified')
             ->paginate($perPage);
@@ -35,26 +38,41 @@ class BrowseTrackerController extends Controller
                 'total'        => $drivers->total(),
             ]
         ], __('Browse Trackers successfully fetched.'));
-
     }
 
-
+    /**
+     * Display details of a specific tracker.
+     */
     public function show($id)
     {
-        $driver = User::with(['experiencePreference', 'driverDetail','personalInformation' ,'setAvailabilities'])
+        $driver = User::with([
+            'experiencePreference',
+            'driverDetail',
+            'personalInformation',
+            'setAvailabilities'
+        ])
             ->where('user_type', 'trucker')
             ->where('status', 'verified')
-            ->findOrFail($id);
-        return $this->sendResponse(new BrowseTrackerDetailsResource($driver),__('Browse Tracker details successfully fetched.'));
+            ->find($id);
+        if(!$driver){
+            return $this->sendError(__('Trucker not found.'));
+        }
+
+        return $this->sendResponse(
+            new BrowseTrackerDetailsResource($driver),
+            __('Browse Tracker details successfully fetched.')
+        );
     }
 
-    //hire tracker request
+    /**
+     * Send a hire request to a tracker.
+     */
     public function sendHireRequest(Request $request)
     {
         $request->validate([
             'tracker_id' => 'required|exists:users,id',
-            'date' => 'required|date',          // requested work date
-            'reason' => 'nullable|string',      // optional short description/reason
+            'date'       => 'required|date|after_or_equal:today',     // requested work date
+            'reason'     => 'nullable|string',   // optional short description/reason
         ]);
 
         $tracker = User::findOrFail($request->tracker_id);
@@ -66,15 +84,17 @@ class BrowseTrackerController extends Controller
             ->first();
 
         if ($existingRequest) {
-            return $this->sendError('A hire request for this tracker on the selected date is already pending.');
+            return $this->sendError(
+                'A hire request for this tracker on the selected date is already pending.'
+            );
         }
 
         // Create the hire request
         $hireRequest = HireRequest::create([
             'tracker_id' => $tracker->id,
             'shipper_id' => auth()->id(),
-            'date' => $request->date,
-            'reason' => $request->reason,
+            'date'       => $request->date,
+            'reason'     => $request->reason,
             'expires_at' => Carbon::now()->addHours(24), // 24 hours to accept
         ]);
 
