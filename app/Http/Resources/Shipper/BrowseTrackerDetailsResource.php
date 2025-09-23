@@ -14,7 +14,7 @@ class BrowseTrackerDetailsResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'avatar' =>$this->personalInformation->avatar ? Helper::generateURL($this->personalInformation->avatar) : '',
+            'avatar' => Helper::generateURL($this->personalInformation->avatar) ?? '',
             'about' => $this->personalInformation->about ?? null,
             'ratting' => [
                 'rating' => $this->rating ?? 0,
