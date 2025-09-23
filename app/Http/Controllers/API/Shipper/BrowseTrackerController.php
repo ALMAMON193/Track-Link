@@ -12,6 +12,7 @@ use App\Notifications\TrackerHiredNotification;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class BrowseTrackerController extends Controller
 {
@@ -99,8 +100,11 @@ class BrowseTrackerController extends Controller
         ]);
 
         // Notify tracker
-        $tracker->notify(new TrackerHiredNotification($hireRequest));
-
+        try {
+            $tracker->notify(new TrackerHiredNotification($hireRequest));
+        } catch (\Exception $e) {
+            Log::error('Email notification failed: '.$e->getMessage());
+        }
         return $this->sendResponse(
             new BrowseTrackerResource($tracker),
             __('Hire request successfully sent.')
