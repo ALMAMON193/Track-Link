@@ -3,6 +3,7 @@
 namespace App\Livewire\Auth;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Livewire\Component;
 
 class LoginComponent extends Component
@@ -15,15 +16,19 @@ class LoginComponent extends Component
 
     public function login()
     {
-        $credentials = [
-            'email' => $this->email,
-            'password' => $this->password,
-        ];
+        $this->validate([
+            'email' => 'required|email',
+            'password' => 'required|min:6',
+        ]);
 
-        if (Auth::attempt($credentials, $this->remember)) {
-            return redirect()->intended('/dashboard');
+        if (! Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
+            throw ValidationException::withMessages([
+                'email' => __('The provided credentials do not match our records.'),
+            ]);
         }
-        session()->flash('error', 'Invalid credentials');
+
+        // Successful login
+        return redirect()->intended('/dashboard'); // change to your dashboard route
     }
 
     public function render()

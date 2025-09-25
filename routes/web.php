@@ -19,6 +19,5 @@ Route::middleware(['admin'])->group(function () {
     // Smtp Server Settings
     Route::get('settings', SystemSmtpIndexComponent::class)->name('settings');
 });
-
 // API routes
 require __DIR__.'/api.php';
