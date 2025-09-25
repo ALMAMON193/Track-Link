@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'shipper' => \App\Http\Middleware\ShipperMiddleware::class,
             'trucker' => \App\Http\Middleware\TruckerMiddleware::class,
             'admin'   => \App\Http\Middleware\AdminMiddleware::class,
+            'verified' => \App\Http\Middleware\VerifiedUserMiddleware::class,
         ]);
 
     })

@@ -14,6 +14,6 @@ class AdminMiddleware
             return $next($request);
         }
 
-        return response()->json(['message' => 'Unauthorized. Admin access only.'], 403);
+        return redirect()->route('home');
     }
 }

@@ -5,17 +5,15 @@ namespace App\Models;
 use App\Notifications\CustomEmailVerification;
 use App\Notifications\CustomResetPassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\URL;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasFactory, Notifiable, HasApiTokens;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $fillable = [
         'name',
@@ -49,7 +47,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function sendEmailVerifiedNotification(): void
     {
-        $frontendUrl = config('app.frontend_url') . '/auth/verified-success';
+        $frontendUrl = config('app.frontend_url').'/auth/verified-success';
 
         $verificationUrl = URL::temporarySignedRoute(
             'verification.verify',
@@ -62,42 +60,45 @@ class User extends Authenticatable implements MustVerifyEmail
         );
         $this->notify(new CustomEmailVerification($verificationUrl));
     }
+
     /**
      * Send custom password reset notification
      */
-    public function sendPasswordResetNotification ($token): void
+    public function sendPasswordResetNotification($token): void
     {
-        $this->notify (new CustomResetPassword($token));
+        $this->notify(new CustomResetPassword($token));
     }
 
     /**
      * Relationships
      */
-    public function personalInformation ()
+    public function personalInformation()
     {
-        return $this->hasOne (PersonalInformation::class);
+        return $this->hasOne(PersonalInformation::class);
     }
 
-    public function jobApplications ()
+    public function jobApplications()
     {
-        return $this->hasMany (JobApplication::class);
+        return $this->hasMany(JobApplication::class);
     }
 
-    public function jobPosts ()
+    public function jobPosts()
     {
-        return $this->hasMany (JobPost::class);
+        return $this->hasMany(JobPost::class);
     }
-    public function setAvailabilities(){
+
+    public function setAvailabilities()
+    {
         return $this->hasMany(SetAvailability::class);
     }
 
-    public function experiencePreference ()
+    public function experiencePreference()
     {
-        return $this->hasOne (ExperiencePreference::class);
+        return $this->hasOne(ExperiencePreference::class);
     }
 
-    public function driverDetail ()
+    public function driverDetail()
     {
-        return $this->hasOne (DriverDetail::class);
+        return $this->hasOne(DriverDetail::class);
     }
 }
