@@ -8,7 +8,6 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class PostJobDetailsResource extends JsonResource
 {
-
     public function toArray(Request $request): array
     {
 
@@ -18,26 +17,32 @@ class PostJobDetailsResource extends JsonResource
             'package_name' => $this->package_name,
             'shipment_type' => $this->shipment_type,
             'priority' => $this->priority,
-            'pickup_location'   => "{$this->pickup_city}, {$this->pickup_state}",
+            'pickup_location' => "{$this->pickup_city}, {$this->pickup_state}",
             'delivery_location' => "{$this->delivery_city}, {$this->delivery_state}",
-            'cargo'             => "{$this->quantity} containers, {$this->weight} {$this->weight_type}",
+            'cargo' => "{$this->quantity} containers, {$this->weight} {$this->weight_type}",
             'distance' => Helper::formatDistance(
                 $this->pickup_latitude,
                 $this->pickup_longitude,
                 $this->delivery_latitude,
                 $this->delivery_longitude
             ),
+            'location' => [
+                $this->pickup_latitude,
+                $this->pickup_longitude,
+                $this->delivery_latitude,
+                $this->delivery_longitude,
+            ],
             'departed_schedule' => [
                 'departed_start' => Helper::formatDate($this->pickup_date),
-                'departed_end'   => Helper::formatDate($this->delivery_date),
-                'percentage'     => Helper::percentageCalculate($this->delivery_status),
+                'departed_end' => Helper::formatDate($this->delivery_date),
+                'percentage' => Helper::percentageCalculate($this->delivery_status),
             ],
             'tracking_timeline' => Helper::getTrackingTimeline($this),
             'shipment_information' => [
                 'package_name' => $this->package_name,
                 'shipping_method' => 'Ocean Freight',
                 'insurance' => 'Full Coverage',
-                'incoterms' => 'FOB ' . $this->pickup_city,
+                'incoterms' => 'FOB '.$this->pickup_city,
                 'container_type' => '40ft Standard',
             ],
             'options' => [

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Traits;
+
 trait ApiResponse
 {
     public function sendResponse($result, $message, $token = null, $code = 200): \Illuminate\Http\JsonResponse
@@ -12,18 +13,18 @@ trait ApiResponse
                 'data' => $result,
                 'message' => $message,
                 'pagination' => [
-                    'total'        => $paginator->total(),
-                    'per_page'     => $paginator->perPage(),
+                    'total' => $paginator->total(),
+                    'per_page' => $paginator->perPage(),
                     'current_page' => $paginator->currentPage(),
-                    'last_page'    => $paginator->lastPage(),
-                    'from'         => $paginator->firstItem(),
-                    'to'           => $paginator->lastItem(),
+                    'last_page' => $paginator->lastPage(),
+                    'from' => $paginator->firstItem(),
+                    'to' => $paginator->lastItem(),
                 ],
             ];
         } else {
             $response = [
                 'success' => true,
-                'data'    => $result,
+                'data' => $result,
                 'message' => $message,
             ];
         }
@@ -36,16 +37,16 @@ trait ApiResponse
         return response()->json($response, $code);
     }
 
-
     public function sendError(string $error, array $errorMessages = [], int $code = 404): \Illuminate\Http\JsonResponse
     {
         $response = [
             'success' => false,
             'message' => $error,
         ];
-        if (!empty($errorMessages)) {
+        if (! empty($errorMessages)) {
             $response['data'] = $errorMessages;
         }
+
         return response()->json($response, $code);
     }
 }

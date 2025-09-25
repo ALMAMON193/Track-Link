@@ -119,20 +119,20 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::post('delete/account',                           [ProfileSettingController::class, 'deleteAccount']);
 
         // Browse Jobs
-        Route::get('browse-job',                                  [BrowseJobController::class, 'browseJob']);
-        Route::post('apply-job',                                  [BrowseJobController::class, 'applyJob']);
-        Route::get('browse-job-details/{id}',                     [BrowseJobController::class, 'jobDetails']);
+        Route::get('browse-job',                                [BrowseJobController::class, 'browseJob']);
+        Route::post('apply-job',                                [BrowseJobController::class, 'applyJob']);
+        Route::get('browse-job-details/{id}',                   [BrowseJobController::class, 'jobDetails']);
 
         // Set Availability
-        Route::get('set-availability',                             [SetAvailabilityController::class, 'index']);
-        Route::post('set-availability/store',                      [SetAvailabilityController::class, 'store']);
+        Route::get('set-availability',                          [SetAvailabilityController::class, 'index']);
+        Route::post('set-availability/store',                   [SetAvailabilityController::class, 'store']);
 
         // Overview
-        Route::get('home-overview',                                 [TruckerOverviewController::class, 'overview']);
+        Route::get('home-overview',                             [TruckerOverviewController::class, 'overview']);
 
         // Notification
-        Route::get('/notifications',                                  [NotificationController::class, 'index']);
-        Route::post('/notifications/{id}/read',                       [NotificationController::class, 'markAsRead']);
+        Route::get('/notifications',                            [NotificationController::class, 'index']);
+        Route::post('/notifications/{id}/read',                 [NotificationController::class, 'markAsRead']);
 
     });
 

@@ -7,7 +7,6 @@ use App\Http\Requests\Shipper\PostJobRequest;
 use App\Http\Resources\Shipper\PostJobDetailsResource;
 use App\Models\JobPost;
 use App\Traits\ApiResponse;
-use Illuminate\Http\Request;
 
 class PostJobController extends Controller
 {
