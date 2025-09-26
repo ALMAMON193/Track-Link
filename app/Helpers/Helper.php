@@ -10,7 +10,7 @@ class Helper
 {
     public static function getDistance($lat1, $lon1, $lat2, $lon2): ?float
     {
-        if (!$lat1 || !$lon1 || !$lat2 || !$lon2) {
+        if (! $lat1 || ! $lon1 || ! $lat2 || ! $lon2) {
             return null;
         }
 
@@ -24,11 +24,11 @@ class Helper
         $lonDelta = $lon2 - $lon1;
 
         $angle = 2 * asin(
-                sqrt(
-                    pow(sin($latDelta / 2), 2) +
-                    cos($lat1) * cos($lat2) * pow(sin($lonDelta / 2), 2)
-                )
-            );
+            sqrt(
+                pow(sin($latDelta / 2), 2) +
+                cos($lat1) * cos($lat2) * pow(sin($lonDelta / 2), 2)
+            )
+        );
 
         return $earthRadius * $angle;
     }
@@ -36,30 +36,33 @@ class Helper
     public static function formatDistance($lat1, $lon1, $lat2, $lon2): string
     {
         $distance = self::getDistance($lat1, $lon1, $lat2, $lon2);
-        return $distance ? round($distance, 2) . ' km distance'  : 'N/A';
+
+        return $distance ? round($distance, 2).' km distance' : 'N/A';
     }
+
     public static function formatDate($date, $format = 'M d'): ?string
     {
         return $date ? Carbon::parse($date)->format($format) : null;
     }
+
     public static function percentageCalculate($status): int
     {
         return match ($status) {
             'In_Transport' => 50,
-            'Delayed'      => 30,
-            'Complete'     => 100,
-            default        => 0,
+            'Delayed' => 30,
+            'Complete' => 100,
+            default => 0,
         };
     }
+
     public static function getTrackingTimeline($jobPost): array
     {
         // Predefined steps in correct order
         $steps = [
-            'Customs Clearance (Origin)',
+            'Customs Clearance',
             'Departed from Port',
             'In Transit',
             'Arrived at Port',
-            'Customs Clearance (Destination)',
         ];
 
         $timeline = [];
@@ -69,19 +72,20 @@ class Helper
             $history = $histories->get($step);
 
             $timeline[] = [
-                'status'    => $step,
-                'location'  => $history?->location,
-                'datetime'  => $history?->datetime
+                'status' => $step,
+                'location' => $history?->location,
+                'datetime' => $history?->datetime
                     ? Carbon::parse($history->datetime)->format('M d, Y • h:i A')
                     : null,
-                'current'   => $jobPost->tracking_time === $step,
+                'current' => $jobPost->tracking_time === $step,
                 'completed' => $history !== null,
             ];
         }
+
         return $timeline;
     }
 
-    //user details and overview
+    // user details and overview
     public static function calculateJobStats($userId): array
     {
         $completedJobs = JobPost::whereHas('applications', function ($q) use ($userId) {
@@ -100,27 +104,27 @@ class Helper
 
         return [
             'complete_job' => $completedJobs,
-            'ratting'      => number_format($averageRating, 1),
-            'job_success'  => number_format($jobSuccess, 1),
+            'ratting' => number_format($averageRating, 1),
+            'job_success' => number_format($jobSuccess, 1),
         ];
     }
 
     public static function uploadFile($folderName, $file, $fileName = null): string
     {
         // Ensure folder exists
-        $uploadPath = public_path('uploads/' . $folderName);
-        if (!file_exists($uploadPath)) {
+        $uploadPath = public_path('uploads/'.$folderName);
+        if (! file_exists($uploadPath)) {
             mkdir($uploadPath, 0755, true);
         }
 
         // Generate file name if not provided
-        $fileName = $fileName ?? time() . '_' . Str::random(8) . '.' . $file->getClientOriginalExtension();
+        $fileName = $fileName ?? time().'_'.Str::random(8).'.'.$file->getClientOriginalExtension();
 
         // Move file to public folder
         $file->move($uploadPath, $fileName);
 
         // Return relative path for URL usage
-        return 'uploads/' . $folderName . '/' . $fileName;
+        return 'uploads/'.$folderName.'/'.$fileName;
     }
 
     /**
@@ -128,7 +132,7 @@ class Helper
      */
     public static function deleteFile(?string $filePath): bool
     {
-        if (!$filePath) {
+        if (! $filePath) {
             return false; // nothing to delete
         }
 
@@ -141,7 +145,6 @@ class Helper
 
         return false;
     }
-
 
     /**
      * Generate a public URL for the uploaded file

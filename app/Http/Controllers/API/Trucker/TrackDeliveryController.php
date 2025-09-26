@@ -104,7 +104,7 @@ class TrackDeliveryController extends Controller
     {
         try {
             $validated = $request->validate([
-                'tracking_time_status' => 'required|in:Customs Clearance (Origin),Departed from Port,In Transit,Arrived at Port,Customs Clearance (Destination)',
+                'tracking_time_status' => 'required|in:Customs Clearance,Departed from Port,In Transit,Arrived at Port',
                 'location' => 'nullable|string',
             ]);
 
