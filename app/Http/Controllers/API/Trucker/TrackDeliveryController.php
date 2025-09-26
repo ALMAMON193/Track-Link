@@ -106,7 +106,6 @@ class TrackDeliveryController extends Controller
             $validated = $request->validate([
                 'tracking_time_status' => 'required|in:Customs Clearance (Origin),Departed from Port,In Transit,Arrived at Port,Customs Clearance (Destination)',
                 'location' => 'nullable|string',
-                'datetime' => 'nullable',
             ]);
 
             $jobPost = JobPost::findOrFail($jobPostId);
@@ -148,7 +147,7 @@ class TrackDeliveryController extends Controller
                 ['jobPostId' => $jobPostId]
             );
 
-            return $this->sendError('Something went wrong. Please try again later.');
+            return $this->sendError('Something went wrong. Please try again later.'.$e->getMessage());
         }
     }
 }
