@@ -104,21 +104,22 @@ class TrackDeliveryController extends Controller
     {
         try {
             $validated = $request->validate([
-                'tracking_time_status' => 'required|in:Customs Clearance,Departed from Port,In Transit,Arrived at Port',
+                'tracking_status' => 'required|in:Customs Clearance,Departed from Port,In Transit,Arrived at Port',
                 'location' => 'nullable|string',
+                'datetime' => 'nullable|date',
             ]);
 
             $jobPost = JobPost::findOrFail($jobPostId);
 
             // Save latest status on JobPost
-            $jobPost->tracking_time = $validated['tracking_time_status'];
+            $jobPost->tracking_status = $validated['tracking_status'];
             $jobPost->tracking_location = $validated['location'] ?? null;
             $jobPost->tracking_date = $validated['datetime'] ?? now();
             $jobPost->save();
 
             // Insert into tracking history
             $jobPost->trackingHistories()->create([
-                'status' => $validated['tracking_time_status'],
+                'status' => $validated['tracking_status'],
                 'location' => $validated['location'] ?? null,
                 'datetime' => $validated['datetime'] ?? now(),
             ]);
@@ -126,7 +127,7 @@ class TrackDeliveryController extends Controller
             // Send notification to job owner
             if ($jobPost->user) {
                 $jobPost->user->notify(
-                    new OrderStatusUpdated($jobPost, 'Tracking', $validated['tracking_time_status'])
+                    new OrderStatusUpdated($jobPost, 'Tracking', $validated['tracking_status'])
                 );
             }
 
@@ -147,7 +148,7 @@ class TrackDeliveryController extends Controller
                 ['jobPostId' => $jobPostId]
             );
 
-            return $this->sendError('Something went wrong. Please try again later.'.$e->getMessage());
+            return $this->sendError('Something went wrong. Please try again later. '.$e->getMessage());
         }
     }
 }
