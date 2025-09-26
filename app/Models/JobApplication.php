@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+
 class JobApplication extends Model
 {
-
     protected $fillable = [
         'user_id',         // Tracker ID
         'job_post_id',
@@ -29,6 +29,7 @@ class JobApplication extends Model
     {
         return $this->belongsTo(JobPost::class);
     }
+
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class);

@@ -7,16 +7,15 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class MyJobResource extends JsonResource
 {
-
     public function toArray(Request $request): array
     {
         $job = $this->jobPost;
 
         return [
-            'id'    => $this->id,
+            'id' => $this->id,
             'job_id' => $job->job_id ?? null,
             'package_name' => $job->package_name ?? null,
-            'shipment_type'     => $this->shipment_type,
+            'shipment_type' => $this->shipment_type,
             'pickup_location' => [
                 'address' => $job->pickup_address ?? null,
                 'city' => $job->pickup_city ?? null,
@@ -35,5 +34,4 @@ class MyJobResource extends JsonResource
             'updated_at' => $this->updated_at ? $this->updated_at->diffForHumans() : null,
         ];
     }
-
 }

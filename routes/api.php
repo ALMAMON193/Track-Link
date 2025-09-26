@@ -72,7 +72,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::get('request-job/{id}', [JobRequestController::class, 'show']);
         Route::get('request-job/{jobId}/users/{userId}', [JobRequestController::class, 'userDetails']);
         Route::post('reject-job/{jobId}/users/{userId}', [JobRequestController::class, 'jobReject']);
-        Route::post('accept-job/{jobId}/users/{userId}', [JobRequestController::class, 'jobAccept']);
+        Route::post('accept-job', [JobRequestController::class, 'jobAccept']);
 
         // Browse Job
         Route::get('browse-job', [BrowseTrackerController::class, 'index']);
@@ -100,6 +100,7 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
         // Jobs
         Route::get('my-jobs', [TrackDeliveryController::class, 'index']);
+        Route::get('job-details/{id}', [TrackDeliveryController::class,'jobDetails']);
         Route::post('job-posts/{id}/delivery-status', [TrackDeliveryController::class, 'updateDeliveryStatus']);
         Route::post('job-posts/{id}/tracking-status', [TrackDeliveryController::class, 'updateTrackingStatus']);
 
