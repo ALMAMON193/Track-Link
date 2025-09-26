@@ -106,7 +106,7 @@ class TrackDeliveryController extends Controller
             $validated = $request->validate([
                 'tracking_time_status' => 'required|in:Customs Clearance (Origin),Departed from Port,In Transit,Arrived at Port,Customs Clearance (Destination)',
                 'location' => 'nullable|string',
-                'datetime' => 'nullable|date',
+                'datetime' => 'nullable',
             ]);
 
             $jobPost = JobPost::findOrFail($jobPostId);
