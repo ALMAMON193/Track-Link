@@ -12,13 +12,10 @@ use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class ProfileSettingController extends Controller
 {
     use ApiResponse;
-
 
     /**
      * Get personal information
@@ -27,14 +24,13 @@ class ProfileSettingController extends Controller
     {
         $user = Auth::user();
 
-        $personalInfo = $user->personalInformation ?? new PersonalInformation();
+        $personalInfo = $user->personalInformation ?? new PersonalInformation;
 
         return $this->sendResponse(
             new PersonalInformationResource($personalInfo),
             'Personal information retrieved successfully.'
         );
     }
-
 
     /**
      * Update personal information
@@ -44,17 +40,15 @@ class ProfileSettingController extends Controller
         $user = auth()->user();
 
         // Update user basic fields
-        $user->name  = $request->name;
+        $user->name = $request->name;
         $user->save();
-
 
         // Update or create personal information
         $personalInfo = $user->personalInformation ?? new PersonalInformation(['user_id' => $user->id]);
-        $personalInfo->city    = $request->city;
+        $personalInfo->city = $request->city;
         $personalInfo->address = $request->address;
-        $personalInfo->phone   = $request->phone;
-        $personalInfo->about   = $request->about;
-
+        $personalInfo->phone = $request->phone;
+        $personalInfo->about = $request->about;
 
         // Handle avatar upload
         if ($request->hasFile('avatar')) {
@@ -74,7 +68,6 @@ class ProfileSettingController extends Controller
         return $this->sendResponse([], 'Personal information updated successfully.');
     }
 
-
     /**
      * Update password
      */
@@ -83,7 +76,7 @@ class ProfileSettingController extends Controller
         $user = auth()->user();
 
         // Check current password
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             return $this->sendError('The current password is incorrect.');
         }
 
@@ -98,7 +91,6 @@ class ProfileSettingController extends Controller
 
         return $this->sendResponse([], 'Password updated successfully.');
     }
-
 
     /**
      * Delete account after confirming email
@@ -127,5 +119,4 @@ class ProfileSettingController extends Controller
 
         return $this->sendResponse([], 'Account deleted successfully.');
     }
-
 }

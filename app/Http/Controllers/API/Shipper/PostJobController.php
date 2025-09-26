@@ -12,7 +12,6 @@ class PostJobController extends Controller
 {
     use ApiResponse;
 
-
     /**
      * Post a new job
      */
@@ -29,14 +28,13 @@ class PostJobController extends Controller
         $count = JobPost::whereYear('created_at', $year)->count() + 1;
 
         // Generate formatted job_id like JOB-2023-001
-        $data['job_id'] = 'JOB-' . $year . '-' . str_pad($count, 3, '0', STR_PAD_LEFT);
+        $data['job_id'] = 'JOB-'.$year.'-'.str_pad($count, 3, '0', STR_PAD_LEFT);
 
         // Create the job post
         JobPost::create($data);
 
         return $this->sendResponse([], __('Job Posted Successfully'));
     }
-
 
     /**
      * Retrieve job post details
@@ -45,7 +43,7 @@ class PostJobController extends Controller
     {
         $job = JobPost::find($id);
 
-        if (!$job) {
+        if (! $job) {
             return $this->sendError('Job not found', [], 404);
         }
 
@@ -54,5 +52,4 @@ class PostJobController extends Controller
             'Job post details retrieved successfully.'
         );
     }
-
 }
