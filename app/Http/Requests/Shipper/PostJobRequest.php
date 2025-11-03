@@ -20,7 +20,6 @@ class PostJobRequest extends FormRequest
             'pickup_address' => 'nullable|string|max:255',
             'pickup_city' => 'required|string|max:100',
             'pickup_state' => 'required|string|max:100',
-            'pickup_zip' => 'required|string|max:20',
             'pickup_latitude' => 'required|numeric',
             'pickup_longitude' => 'required|numeric',
             'delivery_latitude' => 'required|numeric',
@@ -29,7 +28,6 @@ class PostJobRequest extends FormRequest
             'delivery_address' => 'required|string|max:255',
             'delivery_city' => 'required|string|max:100',
             'delivery_state' => 'required|string|max:100',
-            'delivery_zip' => 'required|string|max:20',
 
             'cargo_type' => 'required|string|max:100',
             'weight' => 'required|numeric',

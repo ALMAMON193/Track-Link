@@ -15,7 +15,6 @@ class JobPost extends Model
         'pickup_address',
         'pickup_city',
         'pickup_state',
-        'pickup_zip',
         'pickup_latitude',
         'pickup_longitude',
         'delivery_longitude',
@@ -23,7 +22,6 @@ class JobPost extends Model
         'delivery_address',
         'delivery_city',
         'delivery_state',
-        'delivery_zip',
         'cargo_type',
         'weight',
         'weight_type',
@@ -47,20 +45,21 @@ class JobPost extends Model
         'tracking_status',
         'tracking_location',
         'tracking_date',
-        'is_expired'
+        'is_expired',
     ];
 
     public function user(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
     public function applications()
     {
         return $this->hasMany(JobApplication::class);
     }
+
     public function trackingHistories()
     {
         return $this->hasMany(TrackingHistory::class);
     }
-
 }

@@ -25,7 +25,6 @@ class PostJobDetailsResource extends JsonResource
                 'address' => $this->pickup_address,
                 'city' => $this->pickup_city,
                 'state' => $this->pickup_state,
-                'zip' => $this->pickup_zip,
                 'latitude' => $this->pickup_latitude,
                 'longitude' => $this->pickup_longitude,
                 'pickup_date' => $this->pickup_date ? \Carbon\Carbon::parse($this->pickup_date)->format('F d, Y') : null,
@@ -38,7 +37,6 @@ class PostJobDetailsResource extends JsonResource
                 'address' => $this->delivery_address,
                 'city' => $this->delivery_city,
                 'state' => $this->delivery_state,
-                'zip' => $this->delivery_zip,
                 'pickup_date' => $this->pickup_date ? \Carbon\Carbon::parse($this->pickup_date)->format('F d, Y') : null,
                 'pickup_time' => $this->pickup_time ? \Carbon\Carbon::parse($this->pickup_time)->format('H:i') : null,
                 'delivery_date' => $this->delivery_date ? \Carbon\Carbon::parse($this->delivery_date)->format('F d, Y') : null,
@@ -60,7 +58,7 @@ class PostJobDetailsResource extends JsonResource
                 'package_name' => $this->package_name,
                 'shipping_method' => 'Ocean Freight', // You may want to add this field to the DB if dynamic
                 'insurance' => 'Full Coverage',      // Add DB columns if needed
-                'incoterms' => 'FOB ' . $this->pickup_city,  // Dynamic if possible
+                'incoterms' => 'FOB '.$this->pickup_city,  // Dynamic if possible
                 'container_type' => '40ft Standard',          // Add DB columns if needed
             ],
             'options' => [

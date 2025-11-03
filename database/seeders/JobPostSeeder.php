@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\JobPost;
 use App\Models\JobApplication;
+use App\Models\JobPost;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -27,7 +27,7 @@ class JobPostSeeder extends Seeder
 
         $shipmentTypes = ['Full Truckload', 'Less than Truckload', 'Parcel'];
         $cargoTypes = ['Electronics', 'Furniture', 'Food', 'Clothing'];
-//        $statuses = ['applied', 'accepted', 'rejected'];
+        //        $statuses = ['applied', 'accepted', 'rejected'];
 
         foreach ($shippers as $shipper) {
             // 1 job per shipper
@@ -35,21 +35,19 @@ class JobPostSeeder extends Seeder
             $delivery = $cities[array_rand($cities)];
 
             $job = JobPost::create([
-                'job_id' => 'JOB-' . strtoupper(Str::random(6)),
+                'job_id' => 'JOB-'.strtoupper(Str::random(6)),
                 'user_id' => $shipper->id,
-                'package_name' => 'Package for ' . $shipper->name,
+                'package_name' => 'Package for '.$shipper->name,
                 'shipment_type' => $shipmentTypes[array_rand($shipmentTypes)],
                 'priority' => ['Standard', 'Express', 'Urgent'][array_rand(['Standard', 'Express', 'Urgent'])],
-                'pickup_address' => Str::random(15) . ' Street',
+                'pickup_address' => Str::random(15).' Street',
                 'pickup_city' => $pickup['city'],
                 'pickup_state' => $pickup['state'],
-                'pickup_zip' => rand(10000, 99999),
                 'pickup_latitude' => $pickup['lat'],
                 'pickup_longitude' => $pickup['lng'],
-                'delivery_address' => Str::random(15) . ' Avenue',
+                'delivery_address' => Str::random(15).' Avenue',
                 'delivery_city' => $delivery['city'],
                 'delivery_state' => $delivery['state'],
-                'delivery_zip' => rand(10000, 99999),
                 'delivery_latitude' => $delivery['lat'],
                 'delivery_longitude' => $delivery['lng'],
                 'cargo_type' => $cargoTypes[array_rand($cargoTypes)],
@@ -83,15 +81,15 @@ class JobPostSeeder extends Seeder
             // Assign job applications automatically
             // -----------------------------
             // Assign job applications randomly
-//            $applyingTruckers = $truckers->random(rand(1, $truckers->count()));
-//            foreach ($applyingTruckers as $trucker) {
-//                JobApplication::create([
-//                    'job_post_id' => $job->id,
-//                    'user_id' => $trucker->id,
-//                    'status' => $statuses[array_rand($statuses)],
-//                    'assigned_at' => now()->subDays(rand(1,30)),
-//                ]);
-//            }
+            //            $applyingTruckers = $truckers->random(rand(1, $truckers->count()));
+            //            foreach ($applyingTruckers as $trucker) {
+            //                JobApplication::create([
+            //                    'job_post_id' => $job->id,
+            //                    'user_id' => $trucker->id,
+            //                    'status' => $statuses[array_rand($statuses)],
+            //                    'assigned_at' => now()->subDays(rand(1,30)),
+            //                ]);
+            //            }
         }
     }
 }

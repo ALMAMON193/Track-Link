@@ -1,11 +1,9 @@
 <?php
 
-
 namespace App\Http\Resources\Trucker;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-
 
 class PostJobResource extends JsonResource
 {
@@ -22,7 +20,6 @@ class PostJobResource extends JsonResource
                 'address' => $this->pickup_address,
                 'city' => $this->pickup_city,
                 'state' => $this->pickup_state,
-                'zip' => $this->pickup_zip,
                 'lat' => $this->pickup_latitude,
                 'lng' => $this->pickup_longitude,
             ],
@@ -30,7 +27,6 @@ class PostJobResource extends JsonResource
                 'address' => $this->delivery_address,
                 'city' => $this->delivery_city,
                 'state' => $this->delivery_state,
-                'zip' => $this->delivery_zip,
             ],
             'cargo' => [
                 'type' => $this->cargo_type,
@@ -64,5 +60,4 @@ class PostJobResource extends JsonResource
             'created_at' => $this->created_at->toDateTimeString(),
         ];
     }
-
 }
